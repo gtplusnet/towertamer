@@ -49,7 +49,6 @@ export const useCharacterMovement = ({
       const centerY = viewportHeight / 2;
 
       // Calculate offset to center the character
-      // No additional offset needed since tile size (48px) matches character size (48px)
       const offsetX = characterPixelPos.x - centerX;
       const offsetY = characterPixelPos.y - centerY;
 
