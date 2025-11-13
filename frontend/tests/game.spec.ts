@@ -34,13 +34,12 @@ test.describe('Tower Tamer RPG - Game Initialization', () => {
     expect(dimensions?.height).toBeGreaterThan(0);
   });
 
-  test('should display swipe hint', async ({ page }) => {
+  test('should display joystick controller', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
 
-    // Check for swipe hint text
-    const swipeHint = page.getByTestId('swipe-hint');
-    await expect(swipeHint).toBeVisible({ timeout: 10000 });
-    await expect(swipeHint).toContainText('Swipe to move');
+    // Check for joystick controller
+    const joystickController = page.getByTestId('joystick-controller');
+    await expect(joystickController).toBeVisible({ timeout: 10000 });
   });
 });
 

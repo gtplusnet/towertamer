@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { GameMap } from './components/GameMap/GameMap';
 import { Character } from './components/Character/Character';
-import { TouchController } from './components/TouchController/TouchController';
+import { JoystickController } from './components/JoystickController/JoystickController';
 import { useCharacterMovement } from './hooks/useCharacterMovement';
 import { loadMap } from './utils/mapLoader';
-import type { MapData } from './types/game.types';
+import type { MapData, Direction } from './types/game.types';
 import styles from './App.module.css';
 
 function App() {
@@ -31,7 +31,7 @@ function App() {
   const viewportHeight = window.innerHeight;
 
   // Initialize character movement (only after map is loaded)
-  const { character, move, cameraOffset, tileSize } = useCharacterMovement({
+  const { character, move, startContinuousMovement, stopMovement, cameraOffset, tileSize } = useCharacterMovement({
     initialPosition: { row: 7, col: 5 }, // Center of map
     mapData: mapData || { name: '', width: 10, height: 15, tiles: [] },
     viewportWidth,
@@ -58,9 +58,22 @@ function App() {
     );
   }
 
+  // Handle joystick direction changes
+  const handleDirectionChange = (direction: Direction) => {
+    if (direction === 'idle') {
+      stopMovement();
+    } else {
+      startContinuousMovement(direction);
+    }
+  };
+
   return (
     <div className={styles.app}>
-      <TouchController onSwipe={move}>
+      <JoystickController
+        onDirectionChange={handleDirectionChange}
+        onStart={() => {}}
+        onEnd={stopMovement}
+      >
         <GameMap mapData={mapData} cameraOffset={cameraOffset} />
         <Character
           gridPosition={character.position}
@@ -69,7 +82,7 @@ function App() {
           isMoving={character.isMoving}
           tileSize={tileSize}
         />
-      </TouchController>
+      </JoystickController>
     </div>
   );
 }

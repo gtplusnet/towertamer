@@ -45,8 +45,8 @@ test.describe('Debug Terrain System', () => {
     console.log('Initial map transform:', initialTransform);
 
     // Perform a swipe down gesture
-    const touchController = page.locator('[data-testid="touch-controller"]');
-    const box = await touchController.boundingBox();
+    const joystickController = page.locator('[data-testid="joystick-controller"]');
+    const box = await joystickController.boundingBox();
     if (box) {
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
       await page.mouse.down();

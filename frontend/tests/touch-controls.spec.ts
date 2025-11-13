@@ -5,12 +5,12 @@ test.describe('Tower Tamer RPG - Touch Controls', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    // Verify touch controller exists
-    const touchController = page.getByTestId('touch-controller');
-    await expect(touchController).toBeVisible({ timeout: 10000 });
+    // Verify joystick controller exists
+    const joystickController = page.getByTestId('joystick-controller');
+    await expect(joystickController).toBeVisible({ timeout: 10000 });
 
     // Check that touch-action is set to none
-    const touchAction = await touchController.evaluate((el) =>
+    const touchAction = await joystickController.evaluate((el) =>
       window.getComputedStyle(el).touchAction
     );
     expect(touchAction).toBe('none');

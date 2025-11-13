@@ -27,6 +27,8 @@ export const useCharacterMovement = ({
 
   const movementTimerRef = useRef<NodeJS.Timeout | null>(null);
   const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const continuousMovementRef = useRef<NodeJS.Timeout | null>(null);
+  const currentDirectionRef = useRef<Direction>('idle');
 
   // Calculate tile size based on viewport - MEMOIZED to prevent infinite re-renders
   const tileSize = useMemo(
@@ -69,6 +71,11 @@ export const useCharacterMovement = ({
       clearInterval(animationIntervalRef.current);
       animationIntervalRef.current = null;
     }
+    if (continuousMovementRef.current) {
+      clearInterval(continuousMovementRef.current);
+      continuousMovementRef.current = null;
+    }
+    currentDirectionRef.current = 'idle';
     setCharacter((prev) => ({ ...prev, isMoving: false, animationFrame: 0 }));
   }, []);
 
@@ -120,17 +127,73 @@ export const useCharacterMovement = ({
     [mapData, stopMovement]
   );
 
+  // Start continuous movement in a direction
+  const startContinuousMovement = useCallback(
+    (direction: Direction) => {
+      if (direction === 'idle') return;
+
+      // Clear any existing timers
+      stopMovement();
+
+      // Set the current direction
+      currentDirectionRef.current = direction;
+
+      // Function to perform one movement step
+      const performMove = () => {
+        setCharacter((prev) => {
+          const nextPos = getNextPosition(prev.position, currentDirectionRef.current);
+
+          // Check if move is valid
+          if (!isWithinBounds(nextPos, mapData.width, mapData.height)) {
+            return { ...prev, direction: currentDirectionRef.current };
+          }
+
+          if (!isPositionWalkable(mapData, nextPos.row, nextPos.col)) {
+            return { ...prev, direction: currentDirectionRef.current };
+          }
+
+          // Valid move - update position
+          return {
+            ...prev,
+            position: nextPos,
+            direction: currentDirectionRef.current,
+            isMoving: true,
+            animationFrame: (prev.animationFrame + 1) % 3,
+          };
+        });
+      };
+
+      // Perform first move immediately
+      performMove();
+
+      // Start continuous movement interval (move every 150ms)
+      continuousMovementRef.current = setInterval(performMove, 150);
+
+      // Start animation cycle
+      animationIntervalRef.current = setInterval(() => {
+        setCharacter((prev) => ({
+          ...prev,
+          animationFrame: (prev.animationFrame + 1) % 3,
+        }));
+      }, 150);
+    },
+    [mapData, stopMovement]
+  );
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (movementTimerRef.current) clearTimeout(movementTimerRef.current);
       if (animationIntervalRef.current) clearInterval(animationIntervalRef.current);
+      if (continuousMovementRef.current) clearInterval(continuousMovementRef.current);
     };
   }, []);
 
   return {
     character,
     move,
+    startContinuousMovement,
+    stopMovement,
     cameraOffset,
     tileSize,
   };

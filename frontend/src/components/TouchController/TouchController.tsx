@@ -5,15 +5,28 @@ import styles from './TouchController.module.css';
 
 interface TouchControllerProps {
   onSwipe: (direction: Direction) => void;
+  onSwipeStart?: (direction: Direction) => void;
+  onSwipeEnd?: () => void;
   children: ReactNode;
 }
 
 export const TouchController: React.FC<TouchControllerProps> = ({
   onSwipe,
+  onSwipeStart,
+  onSwipeEnd,
   children,
 }) => {
-  const { handleTouchStart, handleTouchMove, handleTouchEnd, handleMouseDown, handleMouseUp } = useSwipeDetection({
+  const {
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp
+  } = useSwipeDetection({
     onSwipe,
+    onSwipeStart,
+    onSwipeEnd,
     minSwipeDistance: 30,
   });
 
@@ -25,6 +38,7 @@ export const TouchController: React.FC<TouchControllerProps> = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
       {children}
