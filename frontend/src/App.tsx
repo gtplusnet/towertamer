@@ -32,8 +32,8 @@ function App() {
 
   // Initialize character movement (only after map is loaded)
   const { character, move, startContinuousMovement, stopMovement, cameraOffset, tileSize } = useCharacterMovement({
-    initialPosition: { row: 7, col: 5 }, // Center of map
-    mapData: mapData || { name: '', width: 10, height: 15, tiles: [] },
+    initialPosition: { row: 15, col: 10 }, // Center of map
+    mapData: mapData || { name: '', width: 20, height: 30, tiles: [] },
     viewportWidth,
     viewportHeight,
   });
