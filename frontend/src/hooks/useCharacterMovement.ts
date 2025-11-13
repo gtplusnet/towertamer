@@ -104,6 +104,8 @@ export const useCharacterMovement = ({
       // Clear any existing movement
       stopMovement();
 
+      let isPortalMove = false;
+
       setCharacter((prev) => {
         // Calculate next position
         const nextPos = getNextPosition(prev.position, direction);
@@ -123,6 +125,7 @@ export const useCharacterMovement = ({
         // Check if stepping onto a portal
         const tile = getTileAt(mapData, nextPos.row, nextPos.col);
         if (tile?.portalData && onPortalEnter) {
+          isPortalMove = true;
           // Trigger portal after a delay to let player see they entered the portal
           setTimeout(() => onPortalEnter(tile.portalData!), 500);
         }
@@ -131,10 +134,15 @@ export const useCharacterMovement = ({
           ...prev,
           position: nextPos,
           direction,
-          isMoving: true,
+          isMoving: !isPortalMove,
           animationFrame: 0,
         };
       });
+
+      // Don't set up movement timers if entering a portal
+      if (isPortalMove) {
+        return;
+      }
 
       // Start animation cycle (3 frames)
       animationIntervalRef.current = setInterval(() => {
@@ -149,7 +157,7 @@ export const useCharacterMovement = ({
         stopMovement();
       }, 200); // Match the CSS transition duration
     },
-    [mapData, stopMovement]
+    [mapData, stopMovement, onPortalEnter]
   );
 
   // Start continuous movement in a direction
@@ -163,8 +171,14 @@ export const useCharacterMovement = ({
       // Set the current direction
       currentDirectionRef.current = direction;
 
+      // Flag to track if we hit a portal
+      let hitPortal = false;
+
       // Function to perform one movement step
       const performMove = () => {
+        // Don't continue if we already hit a portal
+        if (hitPortal) return;
+
         setCharacter((prev) => {
           const nextPos = getNextPosition(prev.position, currentDirectionRef.current);
 
@@ -181,8 +195,20 @@ export const useCharacterMovement = ({
           // Check if stepping onto a portal
           const tile = getTileAt(mapData, nextPos.row, nextPos.col);
           if (tile?.portalData && onPortalEnter) {
+            hitPortal = true;
+            // Stop all movement timers
+            if (continuousMovementRef.current) clearInterval(continuousMovementRef.current);
+            if (animationIntervalRef.current) clearInterval(animationIntervalRef.current);
             // Trigger portal after a delay to let player see they entered the portal
             setTimeout(() => onPortalEnter(tile.portalData!), 500);
+
+            return {
+              ...prev,
+              position: nextPos,
+              direction: currentDirectionRef.current,
+              isMoving: false,
+              animationFrame: 0,
+            };
           }
 
           return {
@@ -198,6 +224,9 @@ export const useCharacterMovement = ({
       // Perform first move immediately
       performMove();
 
+      // Don't set up intervals if we hit a portal on first move
+      if (hitPortal) return;
+
       // Start continuous movement interval (move every 150ms)
       continuousMovementRef.current = setInterval(performMove, 150);
 
@@ -209,7 +238,7 @@ export const useCharacterMovement = ({
         }));
       }, 150);
     },
-    [mapData, stopMovement]
+    [mapData, stopMovement, onPortalEnter]
   );
 
   // Cleanup on unmount
