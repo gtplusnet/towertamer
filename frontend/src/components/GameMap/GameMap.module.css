@@ -33,8 +33,9 @@
 
 .tile {
   flex-shrink: 0;
-  border: 1px solid rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
+  /* Use box-shadow instead of border to avoid affecting layout */
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
 /* Legacy tile styles - no longer used but kept for compatibility */
