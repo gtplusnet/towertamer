@@ -1,15 +1,18 @@
 import type { MapData, Position } from '../../types/game.types';
+import type { TileSize } from '../../utils/coordinateUtils';
 import { getTerrainProperties } from '../../config/terrainConfig';
 import styles from './GameMap.module.css';
 
 interface GameMapProps {
   mapData: MapData;
   cameraOffset?: Position;  // Camera offset for centering character
+  tileSize: TileSize;  // Explicit tile size for perfect alignment
 }
 
 export const GameMap: React.FC<GameMapProps> = ({
   mapData,
-  cameraOffset = { x: 0, y: 0 }
+  cameraOffset = { x: 0, y: 0 },
+  tileSize
 }) => {
   return (
     <div className={styles.gameMap} data-testid="game-map">
@@ -31,6 +34,8 @@ export const GameMap: React.FC<GameMapProps> = ({
                     className={styles.tile}
                     style={{
                       backgroundColor: terrainProps.color,
+                      width: `${tileSize.width}px`,
+                      height: `${tileSize.height}px`,
                     }}
                     data-terrain={tile.terrain}
                     data-walkable={tile.walkable}

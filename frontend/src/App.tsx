@@ -74,7 +74,7 @@ function App() {
         onStart={() => {}}
         onEnd={stopMovement}
       >
-        <GameMap mapData={mapData} cameraOffset={cameraOffset} />
+        <GameMap mapData={mapData} cameraOffset={cameraOffset} tileSize={tileSize} />
         <Character
           gridPosition={character.position}
           direction={character.direction}
