@@ -1,0 +1,35 @@
+.gameMap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #2d5016;
+}
+
+.grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  flex: 1;
+}
+
+.tile {
+  flex: 1;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tileLight {
+  background-color: #4a7c2f;
+}
+
+.tileDark {
+  background-color: #3d6928;
+}

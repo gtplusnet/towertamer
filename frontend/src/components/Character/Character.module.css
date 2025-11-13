@@ -1,0 +1,16 @@
+.character {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  transition: transform 0.2s linear;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.sprite {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
