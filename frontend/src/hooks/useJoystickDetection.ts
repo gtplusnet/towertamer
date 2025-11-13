@@ -88,17 +88,33 @@ export const useJoystickDetection = ({
     const deltaX = thumbX - joystick.baseX;
     const deltaY = thumbY - joystick.baseY;
 
-    // Limit thumb movement to a maximum radius (60px)
-    const maxRadius = 60;
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-    let constrainedX = thumbX;
-    let constrainedY = thumbY;
+    // Calculate direction first
+    const direction = calculateDirection(deltaX, deltaY);
 
-    if (distance > maxRadius) {
-      const angle = Math.atan2(deltaY, deltaX);
-      constrainedX = joystick.baseX + Math.cos(angle) * maxRadius;
-      constrainedY = joystick.baseY + Math.sin(angle) * maxRadius;
+    // Snap thumb to cardinal directions only
+    const maxRadius = 60;
+    let constrainedX = joystick.baseX;
+    let constrainedY = joystick.baseY;
+
+    if (direction !== 'idle') {
+      const actualDistance = Math.min(distance, maxRadius);
+
+      // Snap to cardinal axes
+      if (direction === 'right') {
+        constrainedX = joystick.baseX + actualDistance;
+        constrainedY = joystick.baseY;
+      } else if (direction === 'left') {
+        constrainedX = joystick.baseX - actualDistance;
+        constrainedY = joystick.baseY;
+      } else if (direction === 'down') {
+        constrainedX = joystick.baseX;
+        constrainedY = joystick.baseY + actualDistance;
+      } else if (direction === 'up') {
+        constrainedX = joystick.baseX;
+        constrainedY = joystick.baseY - actualDistance;
+      }
     }
 
     setJoystick(prev => ({
@@ -106,12 +122,6 @@ export const useJoystickDetection = ({
       thumbX: constrainedX,
       thumbY: constrainedY,
     }));
-
-    // Calculate and trigger direction change
-    const direction = calculateDirection(
-      constrainedX - joystick.baseX,
-      constrainedY - joystick.baseY
-    );
 
     if (direction !== currentDirectionRef.current) {
       currentDirectionRef.current = direction;
@@ -157,16 +167,33 @@ export const useJoystickDetection = ({
     const deltaX = thumbX - joystick.baseX;
     const deltaY = thumbY - joystick.baseY;
 
-    const maxRadius = 60;
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-    let constrainedX = thumbX;
-    let constrainedY = thumbY;
+    // Calculate direction first
+    const direction = calculateDirection(deltaX, deltaY);
 
-    if (distance > maxRadius) {
-      const angle = Math.atan2(deltaY, deltaX);
-      constrainedX = joystick.baseX + Math.cos(angle) * maxRadius;
-      constrainedY = joystick.baseY + Math.sin(angle) * maxRadius;
+    // Snap thumb to cardinal directions only
+    const maxRadius = 60;
+    let constrainedX = joystick.baseX;
+    let constrainedY = joystick.baseY;
+
+    if (direction !== 'idle') {
+      const actualDistance = Math.min(distance, maxRadius);
+
+      // Snap to cardinal axes
+      if (direction === 'right') {
+        constrainedX = joystick.baseX + actualDistance;
+        constrainedY = joystick.baseY;
+      } else if (direction === 'left') {
+        constrainedX = joystick.baseX - actualDistance;
+        constrainedY = joystick.baseY;
+      } else if (direction === 'down') {
+        constrainedX = joystick.baseX;
+        constrainedY = joystick.baseY + actualDistance;
+      } else if (direction === 'up') {
+        constrainedX = joystick.baseX;
+        constrainedY = joystick.baseY - actualDistance;
+      }
     }
 
     setJoystick(prev => ({
@@ -174,11 +201,6 @@ export const useJoystickDetection = ({
       thumbX: constrainedX,
       thumbY: constrainedY,
     }));
-
-    const direction = calculateDirection(
-      constrainedX - joystick.baseX,
-      constrainedY - joystick.baseY
-    );
 
     if (direction !== currentDirectionRef.current) {
       currentDirectionRef.current = direction;

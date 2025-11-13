@@ -56,8 +56,8 @@ export const JoystickController: React.FC<JoystickControllerProps> = ({
           <div
             className={styles.joystickThumb}
             style={{
-              left: `${joystick.thumbX - joystick.baseX}px`,
-              top: `${joystick.thumbY - joystick.baseY}px`,
+              left: `calc(50% + ${joystick.thumbX - joystick.baseX}px)`,
+              top: `calc(50% + ${joystick.thumbY - joystick.baseY}px)`,
             }}
           />
         </div>
