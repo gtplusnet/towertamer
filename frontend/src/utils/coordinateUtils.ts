@@ -6,8 +6,8 @@ export interface TileSize {
 }
 
 /**
- * Calculate tile dimensions based on viewport and map size
- * Tiles will be responsive to fill the viewport
+ * Calculate tile dimensions - now returns fixed size for consistency
+ * All maps use the same tile size regardless of dimensions
  */
 export function calculateTileSize(
   viewportWidth: number,
@@ -15,12 +15,12 @@ export function calculateTileSize(
   mapWidth: number,
   mapHeight: number
 ): TileSize {
-  const tileWidth = viewportWidth / mapWidth;
-  const tileHeight = viewportHeight / mapHeight;
+  // Fixed tile size - character is 48x48, so tiles should be similar size
+  const TILE_SIZE = 48;
 
   return {
-    width: tileWidth,
-    height: tileHeight,
+    width: TILE_SIZE,
+    height: TILE_SIZE,
   };
 }
 
