@@ -3,6 +3,7 @@
   z-index: 10;
   pointer-events: none;
   transform: translate(-50%, -50%);
+  transition: left 0.15s ease-out, top 0.15s ease-out;
 }
 
 .sprite {
