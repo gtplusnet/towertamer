@@ -25,27 +25,27 @@ export const GameMap: React.FC<GameMapProps> = ({
         }}
       >
         <div className={styles.grid}>
-          {/* Render terrain tiles from map data */}
-          {mapData.tiles.map((row, rowIndex) => (
-            <div key={rowIndex} className={styles.row}>
-              {row.map((tile, colIndex) => {
-                const terrainProps = getTerrainProperties(tile.terrain);
-                return (
-                  <div
-                    key={`${rowIndex}-${colIndex}`}
-                    className={styles.tile}
-                    style={{
-                      backgroundColor: terrainProps.color,
-                      width: `${tileSize.width}px`,
-                      height: `${tileSize.height}px`,
-                    }}
-                    data-terrain={tile.terrain}
-                    data-walkable={tile.walkable}
-                  />
-                );
-              })}
-            </div>
-          ))}
+          {/* Render terrain tiles from map data with absolute positioning */}
+          {mapData.tiles.map((row, rowIndex) =>
+            row.map((tile, colIndex) => {
+              const terrainProps = getTerrainProperties(tile.terrain);
+              return (
+                <div
+                  key={`${rowIndex}-${colIndex}`}
+                  className={styles.tile}
+                  style={{
+                    backgroundColor: terrainProps.color,
+                    width: `${tileSize.width}px`,
+                    height: `${tileSize.height}px`,
+                    left: `${colIndex * tileSize.width}px`,
+                    top: `${rowIndex * tileSize.height}px`,
+                  }}
+                  data-terrain={tile.terrain}
+                  data-walkable={tile.walkable}
+                />
+              );
+            })
+          )}
         </div>
         {/* Render character inside map container so it moves with the map */}
         {children}
