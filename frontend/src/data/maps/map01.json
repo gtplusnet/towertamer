@@ -487,8 +487,15 @@
         "walkable": true
       },
       {
-        "terrain": "grass",
-        "walkable": true
+        "terrain": "portal",
+        "walkable": true,
+        "portalData": {
+          "targetMap": "/src/data/maps/map03.json",
+          "targetPosition": {
+            "row": 10,
+            "col": 7
+          }
+        }
       },
       {
         "terrain": "grass",
@@ -2074,8 +2081,15 @@
         "walkable": true
       },
       {
-        "terrain": "tree",
-        "walkable": false
+        "terrain": "portal",
+        "walkable": true,
+        "portalData": {
+          "targetMap": "/src/data/maps/map04.json",
+          "targetPosition": {
+            "row": 6,
+            "col": 11
+          }
+        }
       },
       {
         "terrain": "tree",

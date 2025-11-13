@@ -1,0 +1,765 @@
+{
+  "name": "Dark Cavern",
+  "width": 15,
+  "height": 12,
+  "tiles": [
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "water",
+        "walkable": false
+      },
+      {
+        "terrain": "water",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "water",
+        "walkable": false
+      },
+      {
+        "terrain": "water",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "portal",
+        "walkable": true,
+        "portalData": {
+          "targetMap": "/src/data/maps/map03.json",
+          "targetPosition": {
+            "row": 3,
+            "col": 14
+          }
+        }
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "portal",
+        "walkable": true,
+        "portalData": {
+          "targetMap": "/src/data/maps/map01.json",
+          "targetPosition": {
+            "row": 25,
+            "col": 3
+          }
+        }
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "water",
+        "walkable": false
+      },
+      {
+        "terrain": "water",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "water",
+        "walkable": false
+      },
+      {
+        "terrain": "water",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "grass",
+        "walkable": true
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ],
+    [
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      },
+      {
+        "terrain": "wall",
+        "walkable": false
+      }
+    ]
+  ]
+}
