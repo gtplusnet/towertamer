@@ -49,7 +49,8 @@ export const useCharacterMovement = ({
       const centerY = viewportHeight / 2;
 
       // Calculate offset to center the character
-      const offsetX = characterPixelPos.x - centerX;
+      // Add offset to shift map left (character appears more right/centered in tile)
+      const offsetX = characterPixelPos.x - centerX + 8;
       const offsetY = characterPixelPos.y - centerY;
 
       setCameraOffset({ x: offsetX, y: offsetY });
