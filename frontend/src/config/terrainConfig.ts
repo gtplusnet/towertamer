@@ -27,6 +27,11 @@ export const TERRAIN_CONFIG: Record<TerrainType, TerrainProperties> = {
     walkable: false,
     name: 'Tree',
   },
+  [TerrainType.PORTAL]: {
+    color: '#9b59b6',
+    walkable: true,
+    name: 'Portal',
+  },
 };
 
 // Helper function to get terrain properties

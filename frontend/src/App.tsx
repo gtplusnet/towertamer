@@ -1,20 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { GameMap } from './components/GameMap/GameMap';
 import { Character } from './components/Character/Character';
 import { JoystickController } from './components/JoystickController/JoystickController';
+import { FadeTransition } from './components/FadeTransition/FadeTransition';
 import { useCharacterMovement } from './hooks/useCharacterMovement';
 import { loadMap } from './utils/mapLoader';
-import type { MapData, Direction } from './types/game.types';
+import type { MapData, Direction, PortalData, GridPosition } from './types/game.types';
 import styles from './App.module.css';
 
 function App() {
   const [mapData, setMapData] = useState<MapData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [characterPosition, setCharacterPosition] = useState<GridPosition>({ row: 15, col: 10 });
+  const [currentMapPath, setCurrentMapPath] = useState('/src/data/maps/map01.json');
 
-  // Load map data on mount
+  // Load map data on mount and when map changes
   useEffect(() => {
-    loadMap('/src/data/maps/map01.json')
+    setIsLoading(true);
+    loadMap(currentMapPath)
       .then((data) => {
         setMapData(data);
         setIsLoading(false);
@@ -24,18 +29,35 @@ function App() {
         setError('Failed to load map data');
         setIsLoading(false);
       });
-  }, []);
+  }, [currentMapPath]);
 
   // Get viewport dimensions
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
 
+  // Handle portal entry - switch to new map with fade transition
+  const handlePortalEnter = useCallback((portalData: PortalData) => {
+    setIsTransitioning(true);
+
+    // After fade-out (300ms), load new map
+    setTimeout(() => {
+      setCharacterPosition(portalData.targetPosition);
+      setCurrentMapPath(portalData.targetMap);
+
+      // After map loads, fade back in
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 100);
+    }, 300);
+  }, []);
+
   // Initialize character movement (only after map is loaded)
   const { character, move, startContinuousMovement, stopMovement, cameraOffset, tileSize } = useCharacterMovement({
-    initialPosition: { row: 15, col: 10 }, // Center of map
+    initialPosition: characterPosition,
     mapData: mapData || { name: '', width: 20, height: 30, tiles: [] },
     viewportWidth,
     viewportHeight,
+    onPortalEnter: handlePortalEnter,
   });
 
   if (isLoading) {
@@ -83,6 +105,7 @@ function App() {
           tileSize={tileSize}
         />
       </JoystickController>
+      <FadeTransition isTransitioning={isTransitioning} />
     </div>
   );
 }

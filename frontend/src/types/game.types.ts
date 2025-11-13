@@ -18,12 +18,20 @@ export enum TerrainType {
   WATER = 'water',
   WALL = 'wall',
   TREE = 'tree',
+  PORTAL = 'portal',
+}
+
+// Portal destination data
+export interface PortalData {
+  targetMap: string;
+  targetPosition: GridPosition;
 }
 
 // Individual tile data
 export interface Tile {
   terrain: TerrainType;
   walkable: boolean;
+  portalData?: PortalData;
 }
 
 // Map data structure

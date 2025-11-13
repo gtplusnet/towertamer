@@ -1,10 +1,19 @@
-import type { MapData, Tile, TerrainType } from '../types/game.types';
+import type { MapData, Tile, TerrainType, PortalData, GridPosition } from '../types/game.types';
+
+interface RawTile {
+  terrain: string;
+  walkable: boolean;
+  portalData?: {
+    targetMap: string;
+    targetPosition: GridPosition;
+  };
+}
 
 interface RawMapData {
   name: string;
   width: number;
   height: number;
-  tiles: Array<Array<{ terrain: string; walkable: boolean }>>;
+  tiles: Array<Array<RawTile>>;
 }
 
 /**
@@ -22,11 +31,12 @@ export async function loadMap(mapPath: string): Promise<MapData> {
     // Validate map structure
     validateMapData(rawData);
 
-    // Convert string terrain types to enum
+    // Convert string terrain types to enum and preserve portal data
     const tiles: Tile[][] = rawData.tiles.map((row) =>
       row.map((tile) => ({
         terrain: tile.terrain as TerrainType,
         walkable: tile.walkable,
+        ...(tile.portalData && { portalData: tile.portalData }),
       }))
     );
 

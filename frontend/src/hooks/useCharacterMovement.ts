@@ -1,13 +1,14 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import type { CharacterState, Direction, GridPosition, MapData, Position } from '../types/game.types';
+import type { CharacterState, Direction, GridPosition, MapData, Position, PortalData } from '../types/game.types';
 import { getNextPosition, isWithinBounds, gridToPixel, calculateTileSize } from '../utils/coordinateUtils';
-import { isPositionWalkable } from '../utils/mapLoader';
+import { isPositionWalkable, getTileAt } from '../utils/mapLoader';
 
 interface UseCharacterMovementProps {
   initialPosition: GridPosition;
   mapData: MapData;
   viewportWidth: number;
   viewportHeight: number;
+  onPortalEnter?: (portalData: PortalData) => void;
 }
 
 export const useCharacterMovement = ({
@@ -15,6 +16,7 @@ export const useCharacterMovement = ({
   mapData,
   viewportWidth,
   viewportHeight,
+  onPortalEnter,
 }: UseCharacterMovementProps) => {
   const [character, setCharacter] = useState<CharacterState>({
     position: initialPosition,
@@ -29,6 +31,22 @@ export const useCharacterMovement = ({
   const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const continuousMovementRef = useRef<NodeJS.Timeout | null>(null);
   const currentDirectionRef = useRef<Direction>('idle');
+
+  // Update character position when initialPosition changes (e.g., after portal)
+  useEffect(() => {
+    // Stop any ongoing movement
+    if (movementTimerRef.current) clearTimeout(movementTimerRef.current);
+    if (animationIntervalRef.current) clearInterval(animationIntervalRef.current);
+    if (continuousMovementRef.current) clearInterval(continuousMovementRef.current);
+
+    setCharacter((prev) => ({
+      ...prev,
+      position: initialPosition,
+      direction: 'idle',
+      isMoving: false,
+      animationFrame: 0,
+    }));
+  }, [initialPosition]);
 
   // Calculate tile size based on viewport - MEMOIZED to prevent infinite re-renders
   const tileSize = useMemo(
@@ -102,6 +120,13 @@ export const useCharacterMovement = ({
         }
 
         // Valid move - update position (camera will update via useEffect)
+        // Check if stepping onto a portal
+        const tile = getTileAt(mapData, nextPos.row, nextPos.col);
+        if (tile?.portalData && onPortalEnter) {
+          // Trigger portal after a short delay to allow animation
+          setTimeout(() => onPortalEnter(tile.portalData!), 100);
+        }
+
         return {
           ...prev,
           position: nextPos,
@@ -153,6 +178,13 @@ export const useCharacterMovement = ({
           }
 
           // Valid move - update position
+          // Check if stepping onto a portal
+          const tile = getTileAt(mapData, nextPos.row, nextPos.col);
+          if (tile?.portalData && onPortalEnter) {
+            // Trigger portal after a short delay to allow animation
+            setTimeout(() => onPortalEnter(tile.portalData!), 100);
+          }
+
           return {
             ...prev,
             position: nextPos,
