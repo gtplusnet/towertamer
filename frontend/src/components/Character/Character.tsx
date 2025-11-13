@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { Direction, GridPosition } from '../../types/game.types';
 import type { TileSize } from '../../utils/coordinateUtils';
 import { characterSprites, renderSprite } from '../../utils/spriteRenderer';
+import { gridToPixel } from '../../utils/coordinateUtils';
 import styles from './Character.module.css';
 
 interface CharacterProps {
@@ -32,12 +33,19 @@ export const Character: React.FC<CharacterProps> = ({
     renderSprite(canvasRef.current, sprite, 3);
   }, [direction, animationFrame, isMoving]);
 
+  // Calculate pixel position from grid position
+  const pixelPos = gridToPixel(gridPosition, tileSize);
+
   return (
     <div
       className={styles.character}
       data-testid="character"
       data-grid-row={gridPosition.row}
       data-grid-col={gridPosition.col}
+      style={{
+        left: `${pixelPos.x}px`,
+        top: `${pixelPos.y}px`,
+      }}
     >
       <canvas ref={canvasRef} className={styles.sprite} data-testid="character-canvas" />
     </div>

@@ -7,12 +7,14 @@ interface GameMapProps {
   mapData: MapData;
   cameraOffset?: Position;  // Camera offset for centering character
   tileSize: TileSize;  // Explicit tile size for perfect alignment
+  children?: React.ReactNode;  // Allow rendering character inside map
 }
 
 export const GameMap: React.FC<GameMapProps> = ({
   mapData,
   cameraOffset = { x: 0, y: 0 },
-  tileSize
+  tileSize,
+  children
 }) => {
   return (
     <div className={styles.gameMap} data-testid="game-map">
@@ -45,6 +47,8 @@ export const GameMap: React.FC<GameMapProps> = ({
             </div>
           ))}
         </div>
+        {/* Render character inside map container so it moves with the map */}
+        {children}
       </div>
     </div>
   );
