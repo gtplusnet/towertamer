@@ -123,8 +123,8 @@ export const useCharacterMovement = ({
         // Check if stepping onto a portal
         const tile = getTileAt(mapData, nextPos.row, nextPos.col);
         if (tile?.portalData && onPortalEnter) {
-          // Trigger portal after a short delay to allow animation
-          setTimeout(() => onPortalEnter(tile.portalData!), 100);
+          // Trigger portal after a delay to let player see they entered the portal
+          setTimeout(() => onPortalEnter(tile.portalData!), 500);
         }
 
         return {
@@ -181,8 +181,8 @@ export const useCharacterMovement = ({
           // Check if stepping onto a portal
           const tile = getTileAt(mapData, nextPos.row, nextPos.col);
           if (tile?.portalData && onPortalEnter) {
-            // Trigger portal after a short delay to allow animation
-            setTimeout(() => onPortalEnter(tile.portalData!), 100);
+            // Trigger portal after a delay to let player see they entered the portal
+            setTimeout(() => onPortalEnter(tile.portalData!), 500);
           }
 
           return {
