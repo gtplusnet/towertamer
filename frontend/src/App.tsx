@@ -74,15 +74,14 @@ function App() {
         onStart={() => {}}
         onEnd={stopMovement}
       >
-        <GameMap mapData={mapData} cameraOffset={cameraOffset} tileSize={tileSize}>
-          <Character
-            gridPosition={character.position}
-            direction={character.direction}
-            animationFrame={character.animationFrame}
-            isMoving={character.isMoving}
-            tileSize={tileSize}
-          />
-        </GameMap>
+        <GameMap mapData={mapData} cameraOffset={cameraOffset} tileSize={tileSize} />
+        <Character
+          gridPosition={character.position}
+          direction={character.direction}
+          animationFrame={character.animationFrame}
+          isMoving={character.isMoving}
+          tileSize={tileSize}
+        />
       </JoystickController>
     </div>
   );
