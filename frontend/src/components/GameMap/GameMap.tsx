@@ -20,6 +20,7 @@ export const GameMap: React.FC<GameMapProps> = ({
     <div className={styles.gameMap} data-testid="game-map">
       <div
         className={styles.mapContainer}
+        data-testid="map-container"
         style={{
           transform: `translate(${-cameraOffset.x}px, ${-cameraOffset.y}px)`,
         }}

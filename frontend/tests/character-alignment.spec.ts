@@ -2,52 +2,67 @@ import { test, expect } from '@playwright/test';
 
 test('character should be centered in tile', async ({ page }) => {
   await page.goto('http://localhost:5173');
-  
+
   // Wait for map to load
   await page.waitForSelector('[data-testid="game-map"]', { timeout: 10000 });
   await page.waitForSelector('[data-testid="character"]', { timeout: 5000 });
-  
-  // Get character position
-  const character = await page.locator('[data-testid="character"]');
-  const charBox = await character.boundingBox();
-  
+
+  // Get the character canvas (actual sprite)
+  const canvas = await page.locator('[data-testid="character-canvas"]');
+  const canvasBox = await canvas.boundingBox();
+
   // Get character grid position
+  const character = await page.locator('[data-testid="character"]');
   const gridRow = await character.getAttribute('data-grid-row');
   const gridCol = await character.getAttribute('data-grid-col');
-  
+
   console.log('Character at grid position:', { row: gridRow, col: gridCol });
-  console.log('Character bounding box:', charBox);
-  
-  // Calculate where the tile should be based on grid position
+  console.log('Character canvas box:', canvasBox);
+
+  // Get map container to calculate camera offset
+  const mapContainer = await page.locator('[data-testid="map-container"]');
+  const transform = await mapContainer.evaluate((el) => {
+    return window.getComputedStyle(el).transform;
+  });
+  console.log('Map transform:', transform);
+
+  // Extract translation values from transform matrix
+  // matrix(1, 0, 0, 1, tx, ty) where tx and ty are the translate values
+  const matches = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([^,]+),\s*([^)]+)\)/);
+  const cameraX = matches ? parseFloat(matches[1]) : 0;
+  const cameraY = matches ? parseFloat(matches[2]) : 0;
+
+  console.log('Camera offset:', { x: cameraX, y: cameraY });
+
+  // Calculate where the tile center should be in world coordinates
   // Tiles are 48x48px, positioned absolutely
-  const tileIndex = parseInt(gridRow!) * 20 + parseInt(gridCol!);
   const expectedTileX = parseInt(gridCol!) * 48;
   const expectedTileY = parseInt(gridRow!) * 48;
+  const expectedTileCenterX = expectedTileX + 24; // Center of tile
+  const expectedTileCenterY = expectedTileY + 24;
 
-  console.log('Expected tile position:', { x: expectedTileX, y: expectedTileY, index: tileIndex });
-  console.log('Tile size: 48x48px');
+  console.log('Expected tile center (world coords):', { x: expectedTileCenterX, y: expectedTileCenterY });
 
-  if (charBox) {
-    // Character is fixed at viewport center
-    const viewportCenterX = 375 / 2;  // 187.5
-    const viewportCenterY = 667 / 2;  // 333.5
+  // Calculate where tile center should appear in viewport
+  // viewport_position = world_position + camera_offset
+  const expectedTileCenterViewportX = expectedTileCenterX + cameraX;
+  const expectedTileCenterViewportY = expectedTileCenterY + cameraY;
 
-    const charCenterX = charBox.x + charBox.width / 2;
-    const charCenterY = charBox.y + charBox.height / 2;
+  console.log('Expected tile center (viewport coords):', { x: expectedTileCenterViewportX, y: expectedTileCenterViewportY });
 
-    // Expected tile center in viewport (tile center - camera offset should = viewport center)
-    const expectedTileCenterX = expectedTileX + 24;  // 24 is half of 48
-    const expectedTileCenterY = expectedTileY + 24;
+  if (canvasBox) {
+    // Canvas center in viewport
+    const canvasCenterX = canvasBox.x + canvasBox.width / 2;
+    const canvasCenterY = canvasBox.y + canvasBox.height / 2;
 
-    const offsetX = charCenterX - viewportCenterX;
-    const offsetY = charCenterY - viewportCenterY;
+    const offsetX = canvasCenterX - expectedTileCenterViewportX;
+    const offsetY = canvasCenterY - expectedTileCenterViewportY;
 
-    console.log('Viewport center:', { x: viewportCenterX, y: viewportCenterY });
-    console.log('Character center:', { x: charCenterX, y: charCenterY });
-    console.log('Expected tile center (world):', { x: expectedTileCenterX, y: expectedTileCenterY });
-    console.log('Character offset from viewport center:', { x: offsetX, y: offsetY });
+    console.log('Canvas center (viewport):', { x: canvasCenterX, y: canvasCenterY });
+    console.log('Canvas offset from tile center:', { x: offsetX, y: offsetY });
 
-    // Character should be at viewport center (fixed positioning)
+    // Character canvas should be centered on its tile
+    // Allow up to 2px tolerance for rounding
     expect(Math.abs(offsetX)).toBeLessThan(2);
     expect(Math.abs(offsetY)).toBeLessThan(2);
   }
