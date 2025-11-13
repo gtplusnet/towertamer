@@ -21,33 +21,19 @@ test.describe('Tower Tamer RPG - Touch Controls', () => {
     await page.waitForTimeout(1000);
 
     const character = page.getByTestId('character');
-    const getPosition = (transform: string): { x: number; y: number } => {
-      const match = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([^,]+),\s*([^)]+)\)/);
-      return {
-        x: match ? parseFloat(match[1]) : 0,
-        y: match ? parseFloat(match[2]) : 0,
-      };
-    };
-
-    const initialTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const initialPos = getPosition(initialTransform);
+    const initialRow = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
 
     // Swipe that meets minimum distance (30px+)
     await page.mouse.move(200, 300);
     await page.mouse.down();
-    await page.mouse.move(200, 370); // 70px swipe
+    await page.mouse.move(200, 370); // 70px swipe down
     await page.mouse.up();
     await page.waitForTimeout(300);
 
-    const newTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const newPos = getPosition(newTransform);
+    const newRow = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
 
-    // Position should have changed
-    expect(newPos.y).not.toBe(initialPos.y);
+    // Row should have changed (moved down)
+    expect(newRow).not.toBe(initialRow);
   });
 
   test('should ignore swipe below minimum distance', async ({ page }) => {
@@ -55,18 +41,8 @@ test.describe('Tower Tamer RPG - Touch Controls', () => {
     await page.waitForTimeout(1000);
 
     const character = page.getByTestId('character');
-    const getPosition = (transform: string): { x: number; y: number } => {
-      const match = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([^,]+),\s*([^)]+)\)/);
-      return {
-        x: match ? parseFloat(match[1]) : 0,
-        y: match ? parseFloat(match[2]) : 0,
-      };
-    };
-
-    const initialTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const initialPos = getPosition(initialTransform);
+    const initialRow = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
+    const initialCol = parseInt(await character.getAttribute('data-grid-col') || '0', 10);
 
     // Very small swipe (less than 30px minimum)
     await page.mouse.move(200, 300);
@@ -75,14 +51,12 @@ test.describe('Tower Tamer RPG - Touch Controls', () => {
     await page.mouse.up();
     await page.waitForTimeout(300);
 
-    const newTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const newPos = getPosition(newTransform);
+    const newRow = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
+    const newCol = parseInt(await character.getAttribute('data-grid-col') || '0', 10);
 
     // Position should not have changed
-    expect(newPos.x).toBe(initialPos.x);
-    expect(newPos.y).toBe(initialPos.y);
+    expect(newRow).toBe(initialRow);
+    expect(newCol).toBe(initialCol);
   });
 
   test('should determine correct swipe direction', async ({ page }) => {
@@ -90,35 +64,23 @@ test.describe('Tower Tamer RPG - Touch Controls', () => {
     await page.waitForTimeout(1000);
 
     const character = page.getByTestId('character');
-    const getPosition = (transform: string): { x: number; y: number } => {
-      const match = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([^,]+),\s*([^)]+)\)/);
-      return {
-        x: match ? parseFloat(match[1]) : 0,
-        y: match ? parseFloat(match[2]) : 0,
-      };
-    };
+    const initialRow = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
+    const initialCol = parseInt(await character.getAttribute('data-grid-col') || '0', 10);
 
     // Test horizontal swipe (should move horizontally)
-    const initialTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const initialPos = getPosition(initialTransform);
-
     await page.mouse.move(200, 300);
     await page.mouse.down();
     await page.mouse.move(300, 305); // Mostly horizontal, slight vertical
     await page.mouse.up();
     await page.waitForTimeout(300);
 
-    const newTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const newPos = getPosition(newTransform);
+    const newRow = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
+    const newCol = parseInt(await character.getAttribute('data-grid-col') || '0', 10);
 
-    // X should change more than Y (horizontal movement)
-    const deltaX = Math.abs(newPos.x - initialPos.x);
-    const deltaY = Math.abs(newPos.y - initialPos.y);
-    expect(deltaX).toBeGreaterThan(deltaY);
+    // Column should change (horizontal movement), row should not
+    const deltaRow = Math.abs(newRow - initialRow);
+    const deltaCol = Math.abs(newCol - initialCol);
+    expect(deltaCol).toBeGreaterThan(deltaRow);
   });
 
   test('should handle multiple consecutive swipes', async ({ page }) => {
@@ -126,12 +88,8 @@ test.describe('Tower Tamer RPG - Touch Controls', () => {
     await page.waitForTimeout(1000);
 
     const character = page.getByTestId('character');
-    const getYPosition = (transform: string): number => {
-      const match = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,[^,]+,\s*([^)]+)\)/);
-      return match ? parseFloat(match[1]) : 0;
-    };
 
-    // Perform multiple swipes
+    // Perform multiple swipes and track row positions
     const positions: number[] = [];
 
     for (let i = 0; i < 3; i++) {
@@ -141,13 +99,11 @@ test.describe('Tower Tamer RPG - Touch Controls', () => {
       await page.mouse.up();
       await page.waitForTimeout(300);
 
-      const transform = await character.evaluate((el) =>
-        window.getComputedStyle(el).transform
-      );
-      positions.push(getYPosition(transform));
+      const row = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
+      positions.push(row);
     }
 
-    // Each swipe should move the character further up
+    // Each swipe should move the character further up (row decreases)
     expect(positions[1]).toBeLessThan(positions[0]);
     expect(positions[2]).toBeLessThan(positions[1]);
   });

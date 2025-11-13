@@ -1,12 +1,41 @@
+// Legacy pixel-based position (keeping for coordinate conversion)
 export interface Position {
   x: number;
   y: number;
 }
 
+// Grid-based position for tile system
+export interface GridPosition {
+  row: number;
+  col: number;
+}
+
 export type Direction = 'up' | 'down' | 'left' | 'right' | 'idle';
 
+// Terrain types for tiles
+export enum TerrainType {
+  GRASS = 'grass',
+  WATER = 'water',
+  WALL = 'wall',
+  TREE = 'tree',
+}
+
+// Individual tile data
+export interface Tile {
+  terrain: TerrainType;
+  walkable: boolean;
+}
+
+// Map data structure
+export interface MapData {
+  name: string;
+  width: number;  // columns
+  height: number; // rows
+  tiles: Tile[][];
+}
+
 export interface CharacterState {
-  position: Position;
+  position: GridPosition;  // Now using grid coordinates
   direction: Direction;
   isMoving: boolean;
   animationFrame: number;
@@ -21,9 +50,10 @@ export interface SwipeData {
   deltaY: number;
 }
 
+// Grid-based bounds for map
 export interface GameMapBounds {
-  minX: number;
-  maxX: number;
-  minY: number;
-  maxY: number;
+  minRow: number;
+  maxRow: number;
+  minCol: number;
+  maxCol: number;
 }

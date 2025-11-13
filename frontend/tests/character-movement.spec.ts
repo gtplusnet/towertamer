@@ -5,23 +5,11 @@ test.describe('Tower Tamer RPG - Character Movement', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    // Get initial character position
+    // Get initial character grid position
     const character = page.getByTestId('character');
-    const initialTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-
-    // Extract Y position from transform matrix
-    const getYPosition = (transform: string): number => {
-      const match = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,[^,]+,\s*([^)]+)\)/);
-      return match ? parseFloat(match[1]) : 0;
-    };
-
-    const initialY = getYPosition(initialTransform);
+    const initialRow = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
 
     // Simulate swipe up gesture
-    await page.touchscreen.tap(200, 400);
-    await page.waitForTimeout(50);
     await page.mouse.move(200, 400);
     await page.mouse.down();
     await page.mouse.move(200, 300);
@@ -30,14 +18,11 @@ test.describe('Tower Tamer RPG - Character Movement', () => {
     // Wait for animation
     await page.waitForTimeout(300);
 
-    // Get new position
-    const newTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const newY = getYPosition(newTransform);
+    // Get new grid position
+    const newRow = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
 
-    // Character should have moved up (Y decreased)
-    expect(newY).toBeLessThan(initialY);
+    // Character should have moved up (row decreased)
+    expect(newRow).toBeLessThan(initialRow);
   });
 
   test('should move character down on swipe down', async ({ page }) => {
@@ -45,15 +30,7 @@ test.describe('Tower Tamer RPG - Character Movement', () => {
     await page.waitForTimeout(1000);
 
     const character = page.getByTestId('character');
-    const getYPosition = (transform: string): number => {
-      const match = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,[^,]+,\s*([^)]+)\)/);
-      return match ? parseFloat(match[1]) : 0;
-    };
-
-    const initialTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const initialY = getYPosition(initialTransform);
+    const initialRow = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
 
     // Simulate swipe down
     await page.mouse.move(200, 300);
@@ -62,13 +39,10 @@ test.describe('Tower Tamer RPG - Character Movement', () => {
     await page.mouse.up();
     await page.waitForTimeout(300);
 
-    const newTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const newY = getYPosition(newTransform);
+    const newRow = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
 
-    // Character should have moved down (Y increased)
-    expect(newY).toBeGreaterThan(initialY);
+    // Character should have moved down (row increased)
+    expect(newRow).toBeGreaterThan(initialRow);
   });
 
   test('should move character left on swipe left', async ({ page }) => {
@@ -76,15 +50,7 @@ test.describe('Tower Tamer RPG - Character Movement', () => {
     await page.waitForTimeout(1000);
 
     const character = page.getByTestId('character');
-    const getXPosition = (transform: string): number => {
-      const match = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([^,]+)/);
-      return match ? parseFloat(match[1]) : 0;
-    };
-
-    const initialTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const initialX = getXPosition(initialTransform);
+    const initialCol = parseInt(await character.getAttribute('data-grid-col') || '0', 10);
 
     // Simulate swipe left
     await page.mouse.move(250, 350);
@@ -93,13 +59,10 @@ test.describe('Tower Tamer RPG - Character Movement', () => {
     await page.mouse.up();
     await page.waitForTimeout(300);
 
-    const newTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const newX = getXPosition(newTransform);
+    const newCol = parseInt(await character.getAttribute('data-grid-col') || '0', 10);
 
-    // Character should have moved left (X decreased)
-    expect(newX).toBeLessThan(initialX);
+    // Character should have moved left (col decreased)
+    expect(newCol).toBeLessThan(initialCol);
   });
 
   test('should move character right on swipe right', async ({ page }) => {
@@ -107,15 +70,7 @@ test.describe('Tower Tamer RPG - Character Movement', () => {
     await page.waitForTimeout(1000);
 
     const character = page.getByTestId('character');
-    const getXPosition = (transform: string): number => {
-      const match = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([^,]+)/);
-      return match ? parseFloat(match[1]) : 0;
-    };
-
-    const initialTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const initialX = getXPosition(initialTransform);
+    const initialCol = parseInt(await character.getAttribute('data-grid-col') || '0', 10);
 
     // Simulate swipe right
     await page.mouse.move(150, 350);
@@ -124,13 +79,10 @@ test.describe('Tower Tamer RPG - Character Movement', () => {
     await page.mouse.up();
     await page.waitForTimeout(300);
 
-    const newTransform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const newX = getXPosition(newTransform);
+    const newCol = parseInt(await character.getAttribute('data-grid-col') || '0', 10);
 
-    // Character should have moved right (X increased)
-    expect(newX).toBeGreaterThan(initialX);
+    // Character should have moved right (col increased)
+    expect(newCol).toBeGreaterThan(initialCol);
   });
 
   test('should respect boundary constraints', async ({ page }) => {
@@ -138,13 +90,6 @@ test.describe('Tower Tamer RPG - Character Movement', () => {
     await page.waitForTimeout(1000);
 
     const character = page.getByTestId('character');
-    const getPosition = (transform: string): { x: number; y: number } => {
-      const match = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([^,]+),\s*([^)]+)\)/);
-      return {
-        x: match ? parseFloat(match[1]) : 0,
-        y: match ? parseFloat(match[2]) : 0,
-      };
-    };
 
     // Try to move beyond top boundary multiple times
     for (let i = 0; i < 10; i++) {
@@ -155,12 +100,9 @@ test.describe('Tower Tamer RPG - Character Movement', () => {
       await page.waitForTimeout(250);
     }
 
-    const transform = await character.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    );
-    const position = getPosition(transform);
+    const row = parseInt(await character.getAttribute('data-grid-row') || '0', 10);
 
-    // Character Y should not be less than 0 (top boundary)
-    expect(position.y).toBeGreaterThanOrEqual(0);
+    // Character row should not be less than 0 (top boundary)
+    expect(row).toBeGreaterThanOrEqual(0);
   });
 });

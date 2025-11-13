@@ -1,20 +1,23 @@
 import { useEffect, useRef } from 'react';
-import type { Direction, Position } from '../../types/game.types';
+import type { Direction, GridPosition } from '../../types/game.types';
+import type { TileSize } from '../../utils/coordinateUtils';
 import { characterSprites, renderSprite } from '../../utils/spriteRenderer';
 import styles from './Character.module.css';
 
 interface CharacterProps {
-  position: Position;
+  gridPosition: GridPosition;
   direction: Direction;
   animationFrame: number;
   isMoving: boolean;
+  tileSize: TileSize;
 }
 
 export const Character: React.FC<CharacterProps> = ({
-  position,
+  gridPosition,
   direction,
   animationFrame,
   isMoving,
+  tileSize,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -33,9 +36,8 @@ export const Character: React.FC<CharacterProps> = ({
     <div
       className={styles.character}
       data-testid="character"
-      style={{
-        transform: `translate(${position.x}px, ${position.y}px)`,
-      }}
+      data-grid-row={gridPosition.row}
+      data-grid-col={gridPosition.col}
     >
       <canvas ref={canvasRef} className={styles.sprite} data-testid="character-canvas" />
     </div>

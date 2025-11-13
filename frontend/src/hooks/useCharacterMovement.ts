@@ -1,28 +1,64 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import type { CharacterState, Direction, GameMapBounds } from '../types/game.types';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import type { CharacterState, Direction, GridPosition, MapData, Position } from '../types/game.types';
+import { getNextPosition, isWithinBounds, gridToPixel, calculateTileSize } from '../utils/coordinateUtils';
+import { isPositionWalkable } from '../utils/mapLoader';
 
 interface UseCharacterMovementProps {
-  initialX?: number;
-  initialY?: number;
-  moveSpeed?: number;
-  bounds: GameMapBounds;
+  initialPosition: GridPosition;
+  mapData: MapData;
+  viewportWidth: number;
+  viewportHeight: number;
 }
 
 export const useCharacterMovement = ({
-  initialX = 150,
-  initialY = 250,
-  moveSpeed = 48,
-  bounds,
+  initialPosition,
+  mapData,
+  viewportWidth,
+  viewportHeight,
 }: UseCharacterMovementProps) => {
   const [character, setCharacter] = useState<CharacterState>({
-    position: { x: initialX, y: initialY },
+    position: initialPosition,
     direction: 'idle',
     isMoving: false,
     animationFrame: 0,
   });
 
+  const [cameraOffset, setCameraOffset] = useState<Position>({ x: 0, y: 0 });
+
   const movementTimerRef = useRef<NodeJS.Timeout | null>(null);
   const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Calculate tile size based on viewport - MEMOIZED to prevent infinite re-renders
+  const tileSize = useMemo(
+    () => calculateTileSize(
+      viewportWidth,
+      viewportHeight,
+      mapData.width,
+      mapData.height
+    ),
+    [viewportWidth, viewportHeight, mapData.width, mapData.height]
+  );
+
+  // Update camera offset to center character
+  const updateCamera = useCallback(
+    (gridPos: GridPosition) => {
+      const characterPixelPos = gridToPixel(gridPos, tileSize);
+      const centerX = viewportWidth / 2;
+      const centerY = viewportHeight / 2;
+
+      // Calculate offset to center the character
+      const offsetX = characterPixelPos.x - centerX;
+      const offsetY = characterPixelPos.y - centerY;
+
+      setCameraOffset({ x: offsetX, y: offsetY });
+    },
+    [tileSize, viewportWidth, viewportHeight]
+  );
+
+  // Update camera whenever character position changes
+  useEffect(() => {
+    updateCamera(character.position);
+  }, [character.position, updateCamera]);
 
   const stopMovement = useCallback(() => {
     if (movementTimerRef.current) {
@@ -44,28 +80,24 @@ export const useCharacterMovement = ({
       stopMovement();
 
       setCharacter((prev) => {
-        let newX = prev.position.x;
-        let newY = prev.position.y;
+        // Calculate next position
+        const nextPos = getNextPosition(prev.position, direction);
 
-        // Calculate new position
-        switch (direction) {
-          case 'up':
-            newY = Math.max(bounds.minY, prev.position.y - moveSpeed);
-            break;
-          case 'down':
-            newY = Math.min(bounds.maxY, prev.position.y + moveSpeed);
-            break;
-          case 'left':
-            newX = Math.max(bounds.minX, prev.position.x - moveSpeed);
-            break;
-          case 'right':
-            newX = Math.min(bounds.maxX, prev.position.x + moveSpeed);
-            break;
+        // Check if move is valid (within bounds and walkable)
+        if (!isWithinBounds(nextPos, mapData.width, mapData.height)) {
+          // Can't move out of bounds
+          return prev;
         }
 
+        if (!isPositionWalkable(mapData, nextPos.row, nextPos.col)) {
+          // Can't move to non-walkable tile
+          return prev;
+        }
+
+        // Valid move - update position (camera will update via useEffect)
         return {
           ...prev,
-          position: { x: newX, y: newY },
+          position: nextPos,
           direction,
           isMoving: true,
           animationFrame: 0,
@@ -85,7 +117,7 @@ export const useCharacterMovement = ({
         stopMovement();
       }, 200); // Match the CSS transition duration
     },
-    [moveSpeed, bounds, stopMovement]
+    [mapData, stopMovement]
   );
 
   // Cleanup on unmount
@@ -99,5 +131,7 @@ export const useCharacterMovement = ({
   return {
     character,
     move,
+    cameraOffset,
+    tileSize,
   };
 };

@@ -1,32 +1,46 @@
-import { ReactNode } from 'react';
+import type { MapData, Position } from '../../types/game.types';
+import { getTerrainProperties } from '../../config/terrainConfig';
 import styles from './GameMap.module.css';
 
 interface GameMapProps {
-  children: ReactNode;
+  mapData: MapData;
+  cameraOffset?: Position;  // Camera offset for centering character
 }
 
-export const GameMap: React.FC<GameMapProps> = ({ children }) => {
+export const GameMap: React.FC<GameMapProps> = ({
+  mapData,
+  cameraOffset = { x: 0, y: 0 }
+}) => {
   return (
     <div className={styles.gameMap} data-testid="game-map">
-      <div className={styles.grid}>
-        {/* Simple grass tiles background */}
-        {Array.from({ length: 15 }).map((_, rowIndex) => (
-          <div key={rowIndex} className={styles.row}>
-            {Array.from({ length: 10 }).map((_, colIndex) => {
-              const isAlternate = (rowIndex + colIndex) % 2 === 0;
-              return (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  className={`${styles.tile} ${
-                    isAlternate ? styles.tileLight : styles.tileDark
-                  }`}
-                />
-              );
-            })}
-          </div>
-        ))}
+      <div
+        className={styles.mapContainer}
+        style={{
+          transform: `translate(${-cameraOffset.x}px, ${-cameraOffset.y}px)`,
+        }}
+      >
+        <div className={styles.grid}>
+          {/* Render terrain tiles from map data */}
+          {mapData.tiles.map((row, rowIndex) => (
+            <div key={rowIndex} className={styles.row}>
+              {row.map((tile, colIndex) => {
+                const terrainProps = getTerrainProperties(tile.terrain);
+                return (
+                  <div
+                    key={`${rowIndex}-${colIndex}`}
+                    className={styles.tile}
+                    style={{
+                      backgroundColor: terrainProps.color,
+                    }}
+                    data-terrain={tile.terrain}
+                    data-walkable={tile.walkable}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
-      {children}
     </div>
   );
 };
