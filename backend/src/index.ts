@@ -5,6 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDatabase } from './config/database';
 import authRoutes from './routes/auth.routes';
+import mapRoutes from './routes/map.routes';
 import { SocketService } from './services/socket.service';
 
 // Load environment variables
@@ -44,6 +45,7 @@ app.get('/health', (_req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/maps', mapRoutes);
 
 // 404 handler
 app.use('*', (_req, res) => {

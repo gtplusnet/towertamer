@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
 import { PlayerState } from '../models/PlayerState';
+import { Map } from '../models/Map';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_change_this';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
@@ -48,11 +49,24 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       password,
     });
 
+    // Get default spawn map from database
+    const defaultMap = await Map.findOne({ isDefaultSpawn: true });
+
+    if (!defaultMap) {
+      // Rollback user creation if no default map exists
+      await User.findByIdAndDelete(user._id);
+      res.status(500).json({
+        success: false,
+        message: 'No default spawn map configured. Please contact administrator.',
+      });
+      return;
+    }
+
     // Create initial player state
     const playerState = await PlayerState.create({
       userId: user._id,
       username: user.username,
-      currentMap: process.env.DEFAULT_MAP || 'map01.json',
+      currentMap: defaultMap._id,
       position: {
         row: parseInt(process.env.DEFAULT_SPAWN_ROW || '10'),
         col: parseInt(process.env.DEFAULT_SPAWN_COL || '15'),
@@ -73,6 +87,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
           id: user._id,
           username: user.username,
           email: user.email,
+          isDeveloper: user.isDeveloper,
         },
         playerState: {
           currentMap: playerState.currentMap,
@@ -169,6 +184,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
           id: user._id,
           username: user.username,
           email: user.email,
+          isDeveloper: user.isDeveloper,
         },
         playerState: {
           currentMap: playerState.currentMap,
@@ -214,6 +230,7 @@ export const getCurrentUser = async (
           id: user._id,
           username: user.username,
           email: user.email,
+          isDeveloper: user.isDeveloper,
         },
         playerState: {
           currentMap: playerState.currentMap,

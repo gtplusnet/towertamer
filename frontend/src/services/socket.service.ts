@@ -159,6 +159,14 @@ class SocketService {
   onPlayerState(callback: (state: any) => void): void {
     this.on('player:state', callback);
   }
+
+  onMapReset(callback: (data: { message: string; newMap: string; newPosition: GridPosition }) => void): void {
+    this.on('map:reset', callback);
+  }
+
+  onError(callback: (error: { message: string }) => void): void {
+    this.on('error', callback);
+  }
 }
 
 export const socketService = new SocketService();

@@ -2,6 +2,7 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { PlayerState } from '../models/PlayerState';
 import { User } from '../models/User';
+import { Map as MapModel } from '../models/Map';
 import {
   PlayerMoveData,
   PlayerMapChangeData,
@@ -22,6 +23,33 @@ export class SocketService {
     this.io = io;
     this.setupMiddleware();
     this.setupEventHandlers();
+  }
+
+  // Check if user can access a map
+  private async canAccessMap(userId: string, mapId: any): Promise<boolean> {
+    try {
+      const map = await MapModel.findById(mapId);
+      if (!map) {
+        return false;
+      }
+
+      // If map is published, everyone can access it
+      if (map.isPublished) {
+        return true;
+      }
+
+      // If map is unpublished, only developers can access it
+      const user = await User.findById(userId);
+      return user ? user.isDeveloper : false;
+    } catch (error) {
+      console.error('Error checking map access:', error);
+      return false;
+    }
+  }
+
+  // Get default spawn map
+  private async getDefaultSpawnMap() {
+    return await MapModel.findOne({ isDefaultSpawn: true });
   }
 
   // JWT authentication middleware for socket connections
@@ -94,24 +122,69 @@ export class SocketService {
     username: string
   ): Promise<void> {
     try {
-      // Update player state
-      const playerState = await PlayerState.findOneAndUpdate(
-        { userId },
-        {
-          isOnline: true,
-          socketId: socket.id,
-          lastUpdate: new Date(),
-        },
-        { new: true }
-      );
+      // Get player state
+      let playerState = await PlayerState.findOne({ userId });
 
       if (!playerState) {
         console.error(`Player state not found for user: ${userId}`);
         return;
       }
 
+      // Validate map access
+      const canAccess = await this.canAccessMap(userId, playerState.currentMap);
+
+      if (!canAccess) {
+        console.log(
+          `⚠️  Player ${username} attempted to access unpublished map. Resetting to default spawn.`
+        );
+
+        // Reset player to default spawn map
+        const defaultMap = await this.getDefaultSpawnMap();
+
+        if (!defaultMap) {
+          console.error('No default spawn map found!');
+          socket.emit('error', {
+            message: 'Server configuration error. Please contact administrator.',
+          });
+          return;
+        }
+
+        // Update player state to default spawn
+        playerState = await PlayerState.findOneAndUpdate(
+          { userId },
+          {
+            currentMap: defaultMap._id,
+            position: {
+              row: parseInt(process.env.DEFAULT_SPAWN_ROW || '10'),
+              col: parseInt(process.env.DEFAULT_SPAWN_COL || '15'),
+            },
+            direction: 'idle',
+            isOnline: true,
+            socketId: socket.id,
+            lastUpdate: new Date(),
+          },
+          { new: true }
+        );
+      } else {
+        // Update player state
+        playerState = await PlayerState.findOneAndUpdate(
+          { userId },
+          {
+            isOnline: true,
+            socketId: socket.id,
+            lastUpdate: new Date(),
+          },
+          { new: true }
+        );
+      }
+
+      if (!playerState) {
+        console.error(`Failed to update player state for user: ${userId}`);
+        return;
+      }
+
       // Join room for current map
-      socket.join(playerState.currentMap);
+      socket.join(playerState.currentMap.toString());
 
       // Send player their current state
       socket.emit('player:state', {
@@ -140,12 +213,12 @@ export class SocketService {
       );
 
       // Notify other players on the same map
-      socket.to(playerState.currentMap).emit('player:joined', {
+      socket.to(playerState.currentMap.toString()).emit('player:joined', {
         userId,
         username,
         position: playerState.position,
         direction: playerState.direction,
-        currentMap: playerState.currentMap,
+        currentMap: playerState.currentMap.toString(),
       });
 
       console.log(
@@ -210,6 +283,38 @@ export class SocketService {
     data: PlayerMapChangeData
   ): Promise<void> {
     try {
+      // Validate access to new map
+      const canAccess = await this.canAccessMap(userId, data.newMap);
+
+      if (!canAccess) {
+        console.log(
+          `⚠️  Player ${username} attempted to access unpublished map ${data.newMap}. Blocked.`
+        );
+
+        // Reset player to default spawn map instead
+        const defaultMap = await this.getDefaultSpawnMap();
+
+        if (!defaultMap) {
+          socket.emit('error', {
+            message: 'Cannot access map. Server configuration error.',
+          });
+          return;
+        }
+
+        // Override newMap with default map
+        data.newMap = defaultMap._id.toString();
+        data.newPosition = {
+          row: parseInt(process.env.DEFAULT_SPAWN_ROW || '10'),
+          col: parseInt(process.env.DEFAULT_SPAWN_COL || '15'),
+        };
+
+        socket.emit('map:reset', {
+          message: 'Map not accessible. Redirected to spawn.',
+          newMap: data.newMap,
+          newPosition: data.newPosition,
+        });
+      }
+
       // Get current player state to know old map
       const oldPlayerState = await PlayerState.findOne({ userId });
 
@@ -217,7 +322,7 @@ export class SocketService {
         return;
       }
 
-      const oldMap = oldPlayerState.currentMap;
+      const oldMap = oldPlayerState.currentMap.toString();
 
       // Leave old map room
       socket.leave(oldMap);
@@ -300,7 +405,7 @@ export class SocketService {
 
       if (playerState) {
         // Notify other players on the same map
-        socket.to(playerState.currentMap).emit('player:left', {
+        socket.to(playerState.currentMap.toString()).emit('player:left', {
           userId,
           username,
         });

@@ -23,24 +23,39 @@ export const GamePage = () => {
   const [characterPosition, setCharacterPosition] = useState<GridPosition>(
     playerState?.position || { row: 10, col: 15 }
   );
-  const [currentMapPath, setCurrentMapPath] = useState(
-    playerState?.currentMap ? `/src/data/maps/${playerState.currentMap}` : '/src/data/maps/map01.json'
+  const [currentMapId, setCurrentMapId] = useState<string | null>(
+    playerState?.currentMap || null
   );
 
   // Load map data on mount and when map changes
   useEffect(() => {
-    setIsLoading(true);
-    loadMap(currentMapPath)
-      .then((data) => {
+    const loadMapData = async () => {
+      setIsLoading(true);
+      try {
+        let data: MapData;
+
+        if (currentMapId) {
+          // Load specific map by ObjectId
+          data = await loadMap(currentMapId);
+        } else {
+          // Load default spawn map
+          const { loadDefaultMap } = await import('../utils/mapLoader');
+          data = await loadDefaultMap();
+          setCurrentMapId(data._id); // Update current map ID
+          setCharacterPosition({ row: 10, col: 15 }); // Default spawn position
+        }
+
         setMapData(data);
         setIsLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('Failed to load map:', err);
         setError('Failed to load map data');
         setIsLoading(false);
-      });
-  }, [currentMapPath]);
+      }
+    };
+
+    loadMapData();
+  }, [currentMapId]);
 
   // Responsive viewport dimensions
   const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
@@ -64,13 +79,12 @@ export const GamePage = () => {
     // After fade-out (300ms), load new map
     setTimeout(() => {
       setCharacterPosition(portalData.targetPosition);
-      setCurrentMapPath(portalData.targetMap);
+      setCurrentMapId(portalData.targetMapId);
 
       // Emit map change to socket
-      const newMapFilename = portalData.targetMap.split('/').pop() || 'map01.json';
       if (socketService.isConnected()) {
         socketService.emitPlayerMapChange({
-          newMap: newMapFilename,
+          newMap: portalData.targetMapId,
           newPosition: portalData.targetPosition,
         });
       }
@@ -83,30 +97,69 @@ export const GamePage = () => {
   }, []);
 
   // Initialize character movement (only after map is loaded)
-  const { character, move, startContinuousMovement, stopMovement, cameraOffset, tileSize } = useCharacterMovement({
+  const { character, startContinuousMovement, stopMovement, cameraOffset, tileSize } = useCharacterMovement({
     initialPosition: characterPosition,
-    mapData: mapData || { name: '', width: 20, height: 30, tiles: [] },
+    mapData: mapData || {
+      _id: '',
+      name: '',
+      slug: '',
+      width: 20,
+      height: 30,
+      tiles: [],
+      isPublished: false,
+      isDefaultSpawn: false,
+      createdBy: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
     viewportWidth,
     viewportHeight,
     onPortalEnter: handlePortalEnter,
   });
 
-  // Get current map filename from path
-  const currentMapFilename = currentMapPath.split('/').pop() || 'map01.json';
-
   // Initialize multiplayer
-  const { otherPlayers } = useMultiplayer(currentMapFilename);
+  const { otherPlayers } = useMultiplayer(currentMapId || '');
 
   // Emit socket events when character moves
   useEffect(() => {
-    if (!socketService.isConnected() || !mapData) return;
+    if (!socketService.isConnected() || !mapData || !currentMapId) return;
 
     socketService.emitPlayerMove({
       position: character.position,
       direction: character.direction,
-      currentMap: currentMapFilename,
+      currentMap: currentMapId,
     });
-  }, [character.position, character.direction, currentMapFilename, mapData]);
+  }, [character.position, character.direction, currentMapId, mapData]);
+
+  // Handle map reset from server (when trying to access unpublished map)
+  useEffect(() => {
+    const handleMapReset = (data: { message: string; newMap: string; newPosition: GridPosition }) => {
+      console.warn('Map access denied:', data.message);
+      setIsTransitioning(true);
+
+      setTimeout(() => {
+        setCharacterPosition(data.newPosition);
+        setCurrentMapId(data.newMap);
+
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 100);
+      }, 300);
+    };
+
+    const handleError = (error: { message: string }) => {
+      console.error('Socket error:', error.message);
+      setError(error.message);
+    };
+
+    socketService.onMapReset(handleMapReset);
+    socketService.onError(handleError);
+
+    return () => {
+      socketService.off('map:reset', handleMapReset);
+      socketService.off('error', handleError);
+    };
+  }, []);
 
   if (isLoading) {
     return (

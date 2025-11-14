@@ -18,6 +18,7 @@ export interface User {
   id: string;
   username: string;
   email: string;
+  isDeveloper: boolean;
 }
 
 export interface PlayerState {

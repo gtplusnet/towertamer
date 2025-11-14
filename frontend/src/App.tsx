@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { DeveloperRoute } from './components/DeveloperRoute';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { GamePage } from './pages/GamePage';
+import { MapEditorPage } from './pages/MapEditorPage';
 
 function App() {
   return (
@@ -18,6 +20,14 @@ function App() {
               <ProtectedRoute>
                 <GamePage />
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/map-editor"
+            element={
+              <DeveloperRoute>
+                <MapEditorPage />
+              </DeveloperRoute>
             }
           />
           <Route path="/" element={<Navigate to="/game" replace />} />

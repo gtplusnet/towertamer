@@ -13,17 +13,19 @@ export interface GridPosition {
 export type Direction = 'up' | 'down' | 'left' | 'right' | 'idle';
 
 // Terrain types for tiles
-export enum TerrainType {
-  GRASS = 'grass',
-  WATER = 'water',
-  WALL = 'wall',
-  TREE = 'tree',
-  PORTAL = 'portal',
-}
+export const TerrainType = {
+  GRASS: 'grass',
+  WATER: 'water',
+  WALL: 'wall',
+  TREE: 'tree',
+  PORTAL: 'portal',
+} as const;
+
+export type TerrainType = (typeof TerrainType)[keyof typeof TerrainType];
 
 // Portal destination data
 export interface PortalData {
-  targetMap: string;
+  targetMapId: string; // ObjectId reference to target map
   targetPosition: GridPosition;
 }
 
@@ -34,12 +36,33 @@ export interface Tile {
   portalData?: PortalData;
 }
 
-// Map data structure
+// Map data structure (from database)
 export interface MapData {
+  _id: string; // MongoDB ObjectId
   name: string;
+  slug: string;
   width: number;  // columns
   height: number; // rows
   tiles: Tile[][];
+  isPublished: boolean;
+  isDefaultSpawn: boolean;
+  createdBy: string | null; // User ObjectId or null
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+}
+
+// Map list item (without tiles for performance)
+export interface MapListItem {
+  _id: string;
+  name: string;
+  slug: string;
+  width: number;
+  height: number;
+  isPublished: boolean;
+  isDefaultSpawn: boolean;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CharacterState {

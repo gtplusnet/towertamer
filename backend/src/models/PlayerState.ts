@@ -4,7 +4,7 @@ export interface IPlayerState extends Document {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   username: string; // Denormalized for quick lookup
-  currentMap: string;
+  currentMap: mongoose.Types.ObjectId;
   position: {
     row: number;
     col: number;
@@ -28,9 +28,9 @@ const playerStateSchema = new Schema<IPlayerState>(
       required: true,
     },
     currentMap: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'Map',
       required: true,
-      default: process.env.DEFAULT_MAP || 'map01.json',
     },
     position: {
       row: {

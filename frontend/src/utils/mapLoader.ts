@@ -1,38 +1,33 @@
-import type { MapData, Tile, TerrainType, PortalData, GridPosition } from '../types/game.types';
+import type { MapData, Tile, TerrainType } from '../types/game.types';
+import { mapService } from '../services/map.service';
 
-interface RawTile {
-  terrain: string;
-  walkable: boolean;
-  portalData?: {
-    targetMap: string;
-    targetPosition: GridPosition;
-  };
-}
-
-interface RawMapData {
-  name: string;
-  width: number;
-  height: number;
-  tiles: Array<Array<RawTile>>;
-}
+// Cache for loaded maps to avoid redundant API calls
+const mapCache = new Map<string, MapData>();
 
 /**
- * Load and parse map data from JSON
+ * Load and parse map data from API by map ID
  */
-export async function loadMap(mapPath: string): Promise<MapData> {
+export async function loadMap(mapId: string): Promise<MapData> {
   try {
-    const response = await fetch(mapPath);
-    if (!response.ok) {
-      throw new Error(`Failed to load map: ${response.statusText}`);
+    // Check cache first
+    if (mapCache.has(mapId)) {
+      return mapCache.get(mapId)!;
     }
 
-    const rawData: RawMapData = await response.json();
+    // Fetch from API
+    const response = await mapService.getMapById(mapId);
+
+    if (!response.success || !response.data?.map) {
+      throw new Error(response.message || 'Failed to load map');
+    }
+
+    const mapData = response.data.map;
 
     // Validate map structure
-    validateMapData(rawData);
+    validateMapData(mapData);
 
-    // Convert string terrain types to enum and preserve portal data
-    const tiles: Tile[][] = rawData.tiles.map((row) =>
+    // Convert string terrain types to enum
+    const tiles: Tile[][] = mapData.tiles.map((row) =>
       row.map((tile) => ({
         terrain: tile.terrain as TerrainType,
         walkable: tile.walkable,
@@ -40,12 +35,16 @@ export async function loadMap(mapPath: string): Promise<MapData> {
       }))
     );
 
-    return {
-      name: rawData.name,
-      width: rawData.width,
-      height: rawData.height,
+    // Update tiles with typed version
+    const processedMap: MapData = {
+      ...mapData,
       tiles,
     };
+
+    // Cache the processed map
+    mapCache.set(mapId, processedMap);
+
+    return processedMap;
   } catch (error) {
     console.error('Error loading map:', error);
     throw error;
@@ -53,9 +52,65 @@ export async function loadMap(mapPath: string): Promise<MapData> {
 }
 
 /**
+ * Load the default spawn map
+ */
+export async function loadDefaultMap(): Promise<MapData> {
+  try {
+    const response = await mapService.getDefaultMap();
+
+    if (!response.success || !response.data?.map) {
+      throw new Error(response.message || 'Failed to load default map');
+    }
+
+    const mapData = response.data.map;
+
+    // Validate map structure
+    validateMapData(mapData);
+
+    // Convert string terrain types to enum
+    const tiles: Tile[][] = mapData.tiles.map((row) =>
+      row.map((tile) => ({
+        terrain: tile.terrain as TerrainType,
+        walkable: tile.walkable,
+        ...(tile.portalData && { portalData: tile.portalData }),
+      }))
+    );
+
+    // Update tiles with typed version
+    const processedMap: MapData = {
+      ...mapData,
+      tiles,
+    };
+
+    // Cache the default map
+    mapCache.set(mapData._id, processedMap);
+
+    return processedMap;
+  } catch (error) {
+    console.error('Error loading default map:', error);
+    throw error;
+  }
+}
+
+/**
+ * Clear map cache (useful when map is updated)
+ */
+export function clearMapCache(mapId?: string): void {
+  if (mapId) {
+    mapCache.delete(mapId);
+  } else {
+    mapCache.clear();
+  }
+}
+
+/**
  * Validate map data structure
  */
-function validateMapData(data: RawMapData): void {
+function validateMapData(data: MapData): void {
+  if (!data._id || typeof data._id !== 'string') {
+    throw new Error('Invalid map: missing or invalid ID');
+  }
+
   if (!data.name || typeof data.name !== 'string') {
     throw new Error('Invalid map: missing or invalid name');
   }

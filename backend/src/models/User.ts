@@ -6,6 +6,7 @@ export interface IUser extends Document {
   username: string;
   email: string;
   password: string;
+  isDeveloper: boolean;
   createdAt: Date;
   lastLogin: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -38,6 +39,10 @@ const userSchema = new Schema<IUser>(
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters'],
       select: false, // Don't include password in queries by default
+    },
+    isDeveloper: {
+      type: Boolean,
+      default: false,
     },
     lastLogin: {
       type: Date,
