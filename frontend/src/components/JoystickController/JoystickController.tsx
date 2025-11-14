@@ -18,8 +18,8 @@ export const JoystickController: React.FC<JoystickControllerProps> = ({
 }) => {
   const {
     joystick,
+    elementRef,
     handleTouchStart,
-    handleTouchMove,
     handleTouchEnd,
     handleMouseDown,
     handleMouseMove,
@@ -33,10 +33,10 @@ export const JoystickController: React.FC<JoystickControllerProps> = ({
 
   return (
     <div
+      ref={elementRef}
       className={styles.joystickController}
       data-testid="joystick-controller"
       onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
