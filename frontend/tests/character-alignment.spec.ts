@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('character should be centered in tile', async ({ page }) => {
-  await page.goto('http://localhost:5173');
+  await page.goto('http://localhost:4024');
 
   // Wait for map to load
   await page.waitForSelector('[data-testid="game-map"]', { timeout: 10000 });

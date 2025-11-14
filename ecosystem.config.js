@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'towertamer-frontend',
-      cwd: './frontend',
+      cwd: './',
       script: 'yarn',
       args: 'dev',
       interpreter: 'none',

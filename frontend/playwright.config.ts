@@ -9,7 +9,7 @@ export default defineConfig({
   reporter: 'html',
 
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:4024',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -29,7 +29,7 @@ export default defineConfig({
 
   webServer: {
     command: 'yarn dev',
-    url: 'http://localhost:5173',
+    url: 'http://localhost:4024',
     reuseExistingServer: true, // Always reuse PM2 server
     timeout: 120000,
   },

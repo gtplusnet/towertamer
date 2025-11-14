@@ -9,7 +9,7 @@ test.describe('Debug Terrain System', () => {
     });
 
     // Navigate to the page
-    await page.goto('http://100.121.246.85:5173/');
+    await page.goto('http://100.121.246.85:4024/');
 
     // Wait for map to load
     await page.waitForSelector('[data-testid="game-map"]', { timeout: 5000 });

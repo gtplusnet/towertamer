@@ -31,9 +31,20 @@ function App() {
       });
   }, [currentMapPath]);
 
-  // Get viewport dimensions
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
+  // Responsive viewport dimensions
+  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+
+  // Update viewport dimensions on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportWidth(window.innerWidth);
+      setViewportHeight(window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Handle portal entry - switch to new map with fade transition
   const handlePortalEnter = useCallback((portalData: PortalData) => {

@@ -1,0 +1,23 @@
+{
+  "name": "towertamer",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Tower Tamer RPG - Mobile-first web-based RPG game",
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "yarn workspace frontend dev",
+    "dev:frontend": "yarn workspace frontend dev",
+    "build": "yarn workspace frontend build",
+    "build:frontend": "yarn workspace frontend build",
+    "test": "yarn workspace frontend test",
+    "test:frontend": "yarn workspace frontend test",
+    "lint": "yarn workspace frontend lint",
+    "lint:frontend": "yarn workspace frontend lint"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "yarn": ">=1.22.0"
+  }
+}

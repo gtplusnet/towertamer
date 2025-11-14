@@ -4,6 +4,8 @@ A simple web-based RPG game with mobile-first design and touch controls.
 
 ## Project Structure
 
+This is a **monorepo** using Yarn workspaces, allowing you to manage frontend and backend from the root directory.
+
 ```
 towertamer/
 ├── frontend/          # React + Vite + TypeScript frontend
@@ -14,6 +16,8 @@ towertamer/
 │   │   └── utils/         # Utility functions (sprite renderer)
 │   └── package.json
 ├── backend/           # Backend API (planned for future)
+├── package.json       # Root workspace configuration
+├── ecosystem.config.js    # PM2 process manager config
 └── README.md
 ```
 
@@ -56,14 +60,18 @@ pm2 delete towertamer-frontend
 ### Manual Development (Alternative)
 
 ```bash
-cd frontend
+# From root directory (recommended)
 yarn install
+yarn dev
+
+# Or from frontend directory
+cd frontend
 yarn dev
 ```
 
 The game will be available at:
-- Local: `http://localhost:5173`
-- Network: `http://100.121.246.85:5173`
+- Local: `http://localhost:4024`
+- Network: `http://100.121.246.85:4024`
 
 ### Controls
 
