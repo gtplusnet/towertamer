@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { mapService } from '../services/map.service';
 import type { MapData, MapListItem, Tile } from '../types/game.types';
 import { TerrainType } from '../types/game.types';
 import { TileSelector } from '../components/MapEditor/TileSelector';
 import { MapEditorCanvas } from '../components/MapEditor/MapEditorCanvas';
+import { downloadMapImage } from '../utils/mapImageExporter';
 import styles from './MapEditorPage.module.css';
 
 export const MapEditorPage: React.FC = () => {
@@ -13,12 +14,16 @@ export const MapEditorPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Selected terrain for painting
   const [selectedTerrain, setSelectedTerrain] = useState<TerrainType>(TerrainType.NONE);
 
   // Zoom level (0.25 = 25%, 1 = 100%, 2 = 200%)
   const [zoom, setZoom] = useState<number>(1);
+
+  // File input ref for background image upload
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Zoom levels available
   const zoomLevels = [0.25, 0.5, 0.75, 1, 1.5, 2];
@@ -253,6 +258,56 @@ export const MapEditorPage: React.FC = () => {
     setZoom(1);
   };
 
+  // Handle download background image
+  const handleDownloadBackground = async () => {
+    if (!currentMap) return;
+
+    try {
+      await downloadMapImage(currentMap);
+      alert('Map image downloaded successfully!');
+    } catch (err) {
+      console.error('Error downloading map:', err);
+      alert('Failed to download map image');
+    }
+  };
+
+  // Handle upload background image button click
+  const handleUploadBackgroundClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // Handle file selection
+  const handleFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !currentMap) return;
+
+    // Validate file type
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    if (!validTypes.includes(file.type)) {
+      alert('Please select a PNG or JPEG image');
+      event.target.value = ''; // Reset input
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const response = await mapService.uploadBackgroundImage(currentMap._id, file);
+
+      if (response.success && response.data) {
+        setCurrentMap(response.data.map);
+        alert('Background image uploaded successfully!');
+      } else {
+        alert(response.message || 'Failed to upload background image');
+      }
+    } catch (err) {
+      console.error('Error uploading background:', err);
+      alert('Failed to upload background image');
+    } finally {
+      setIsUploading(false);
+      event.target.value = ''; // Reset input
+    }
+  };
+
   if (isLoading && maps.length === 0) {
     return <div className={styles.loading}>Loading maps...</div>;
   }
@@ -349,6 +404,33 @@ export const MapEditorPage: React.FC = () => {
               >
                 Delete
               </button>
+
+              {/* Background Image Controls */}
+              <button
+                className={styles.button}
+                onClick={handleDownloadBackground}
+                title="Download map as PNG image (for creating custom backgrounds)"
+                style={{ marginLeft: '20px' }}
+              >
+                📥 Download BG
+              </button>
+              <button
+                className={styles.button}
+                onClick={handleUploadBackgroundClick}
+                disabled={isUploading}
+                title="Upload custom background image"
+              >
+                {isUploading ? 'Uploading...' : '📤 Upload BG'}
+              </button>
+
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/jpg"
+                onChange={handleFileSelected}
+                style={{ display: 'none' }}
+              />
 
               {/* Zoom Controls */}
               <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px', alignItems: 'center' }}>

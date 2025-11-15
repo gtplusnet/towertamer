@@ -1,4 +1,4 @@
-import { MapData } from '../types/game.types';
+import type { MapData } from '../types/game.types';
 import { getTerrainProperties } from '../config/terrainConfig';
 
 const TILE_SIZE = 24; // Standard tile size in pixels
