@@ -17,6 +17,12 @@ export const MapEditorPage: React.FC = () => {
   // Selected terrain for painting
   const [selectedTerrain, setSelectedTerrain] = useState<TerrainType>(TerrainType.GRASS);
 
+  // Zoom level (0.25 = 25%, 1 = 100%, 2 = 200%)
+  const [zoom, setZoom] = useState<number>(1);
+
+  // Zoom levels available
+  const zoomLevels = [0.25, 0.5, 0.75, 1, 1.5, 2];
+
   // Load all maps on mount
   useEffect(() => {
     loadMaps();
@@ -68,11 +74,11 @@ export const MapEditorPage: React.FC = () => {
     const name = prompt('Enter map name:');
     if (!name) return;
 
-    const width = parseInt(prompt('Enter map width (10-100):', '20') || '20');
-    const height = parseInt(prompt('Enter map height (10-100):', '30') || '30');
+    const width = parseInt(prompt('Enter map width (10-500):', '20') || '20');
+    const height = parseInt(prompt('Enter map height (10-500):', '30') || '30');
 
-    if (width < 10 || width > 100 || height < 10 || height > 100) {
-      alert('Invalid dimensions. Width and height must be between 10 and 100.');
+    if (width < 10 || width > 500 || height < 10 || height > 500) {
+      alert('Invalid dimensions. Width and height must be between 10 and 500.');
       return;
     }
 
@@ -226,6 +232,27 @@ export const MapEditorPage: React.FC = () => {
     });
   };
 
+  // Handle zoom in
+  const handleZoomIn = () => {
+    const currentIndex = zoomLevels.indexOf(zoom);
+    if (currentIndex < zoomLevels.length - 1) {
+      setZoom(zoomLevels[currentIndex + 1]);
+    }
+  };
+
+  // Handle zoom out
+  const handleZoomOut = () => {
+    const currentIndex = zoomLevels.indexOf(zoom);
+    if (currentIndex > 0) {
+      setZoom(zoomLevels[currentIndex - 1]);
+    }
+  };
+
+  // Handle zoom reset
+  const handleZoomReset = () => {
+    setZoom(1);
+  };
+
   if (isLoading && maps.length === 0) {
     return <div className={styles.loading}>Loading maps...</div>;
   }
@@ -322,6 +349,34 @@ export const MapEditorPage: React.FC = () => {
               >
                 Delete
               </button>
+
+              {/* Zoom Controls */}
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <button
+                  className={styles.button}
+                  onClick={handleZoomOut}
+                  disabled={zoom === zoomLevels[0]}
+                  title="Zoom Out"
+                >
+                  -
+                </button>
+                <button
+                  className={styles.button}
+                  onClick={handleZoomReset}
+                  title="Reset Zoom"
+                  style={{ minWidth: '60px' }}
+                >
+                  {Math.round(zoom * 100)}%
+                </button>
+                <button
+                  className={styles.button}
+                  onClick={handleZoomIn}
+                  disabled={zoom === zoomLevels[zoomLevels.length - 1]}
+                  title="Zoom In"
+                >
+                  +
+                </button>
+              </div>
             </>
           )}
         </div>
@@ -340,6 +395,8 @@ export const MapEditorPage: React.FC = () => {
               selectedTerrain={selectedTerrain}
               onTileChange={handleTileChange}
               tileSize={24}
+              zoom={zoom}
+              onZoomChange={setZoom}
             />
           )}
         </div>

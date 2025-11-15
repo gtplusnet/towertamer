@@ -10,15 +10,16 @@ import {
   setDefaultSpawn,
 } from '../controllers/map.controller';
 import { authenticate } from '../middleware/auth.middleware';
+import { optionalAuth } from '../middleware/optionalAuth.middleware';
 import { requireDeveloper } from '../middleware/developer.middleware';
 
 const router = Router();
 
 // Public routes (or auth-aware but not requiring auth)
 // These routes work without authentication but may return different results based on auth status
-router.get('/', getAllMaps); // Returns published maps for non-developers, all for developers
+router.get('/', optionalAuth, getAllMaps); // Returns published maps for non-developers, all for developers
 router.get('/default', getDefaultMap); // Get the default spawn map
-router.get('/:id', getMapById); // Get specific map (checks permissions internally)
+router.get('/:id', optionalAuth, getMapById); // Get specific map (checks permissions internally)
 
 // Developer-only routes
 router.post('/', authenticate, requireDeveloper, createMap);

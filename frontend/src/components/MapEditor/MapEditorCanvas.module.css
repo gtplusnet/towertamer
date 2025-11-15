@@ -1,26 +1,28 @@
+.canvasContainer {
+  flex: 1;
+  overflow: auto !important;
+  background: #0a0e27;
+  padding: 20px;
+}
+
 .canvas {
   display: inline-block;
   border: 2px solid #533483;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   position: relative;
   user-select: none;
-}
-
-.grid {
-  display: grid;
-  gap: 0;
   background: #0a0e27;
 }
 
 .tile {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-  transition: opacity 0.1s;
-  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: crosshair;
+  transition: opacity 0.05s;
+  position: absolute;
 }
 
 .tile:hover {
-  opacity: 0.8;
+  opacity: 0.8 !important;
 }
 
 .tile:hover::after {
@@ -30,19 +32,59 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   pointer-events: none;
 }
 
 .coordinates {
   position: absolute;
-  bottom: 10px;
+  bottom: 50px;
   left: 10px;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.85);
   color: #eee;
   padding: 8px 12px;
   border-radius: 4px;
   font-size: 12px;
   font-family: 'Courier New', monospace;
   pointer-events: none;
+  z-index: 100;
+  border: 1px solid #533483;
+}
+
+.hint {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(83, 52, 131, 0.9);
+  color: #eee;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  pointer-events: none;
+  z-index: 100;
+  border: 1px solid #7c4dff;
+}
+
+/* Scrollbar styling */
+.canvasContainer::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.canvasContainer::-webkit-scrollbar-track {
+  background: #0f3460;
+}
+
+.canvasContainer::-webkit-scrollbar-thumb {
+  background: #533483;
+  border-radius: 6px;
+}
+
+.canvasContainer::-webkit-scrollbar-thumb:hover {
+  background: #7c4dff;
+}
+
+/* Corner piece for scrollbars */
+.canvasContainer::-webkit-scrollbar-corner {
+  background: #0f3460;
 }
