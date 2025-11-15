@@ -191,6 +191,29 @@ export const MapEditorPage: React.FC = () => {
     }
   };
 
+  // Update map name
+  const handleUpdateMapName = async () => {
+    if (!currentMap) return;
+
+    const newName = prompt('Enter new map name:', currentMap.name);
+    if (!newName || newName === currentMap.name) return;
+
+    try {
+      const response = await mapService.updateMap(currentMap._id, { name: newName });
+
+      if (response.success && response.data) {
+        setCurrentMap(response.data.map);
+        await loadMaps(); // Refresh map list
+        alert('Map name updated successfully!');
+      } else {
+        alert(response.message || 'Failed to update map name');
+      }
+    } catch (err) {
+      console.error('Error updating map name:', err);
+      alert('Failed to update map name');
+    }
+  };
+
   // Delete map
   const handleDeleteMap = async () => {
     if (!currentMap) return;
@@ -376,7 +399,12 @@ export const MapEditorPage: React.FC = () => {
       {/* Main Content - Canvas */}
       <div className={styles.mainContent}>
         <div className={styles.toolbar}>
-          <h1 className={styles.toolbarTitle}>
+          <h1
+            className={styles.toolbarTitle}
+            onClick={currentMap ? handleUpdateMapName : undefined}
+            style={{ cursor: currentMap ? 'pointer' : 'default' }}
+            title={currentMap ? 'Click to edit map name' : ''}
+          >
             {currentMap ? currentMap.name : 'Map Editor'}
           </h1>
           {currentMap && (
