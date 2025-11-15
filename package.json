@@ -8,9 +8,13 @@
     "backend"
   ],
   "scripts": {
-    "dev": "yarn workspace frontend dev",
+    "dev": "pm2 start ecosystem.config.js",
     "dev:frontend": "yarn workspace frontend dev",
     "dev:backend": "yarn workspace @towertamer/backend dev",
+    "dev:stop": "pm2 stop ecosystem.config.js",
+    "dev:restart": "pm2 restart ecosystem.config.js",
+    "dev:logs": "pm2 logs",
+    "dev:status": "pm2 list",
     "build": "yarn workspaces run build",
     "build:frontend": "yarn workspace frontend build",
     "build:backend": "yarn workspace @towertamer/backend build",
