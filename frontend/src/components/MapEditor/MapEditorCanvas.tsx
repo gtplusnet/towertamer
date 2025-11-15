@@ -152,6 +152,19 @@ export const MapEditorCanvas: React.FC<MapEditorCanvasProps> = ({
     [zoom, onZoomChange]
   );
 
+  // Paint a tile with the selected terrain
+  const paintTile = useCallback(
+    (row: number, col: number) => {
+      const terrainProps = getTerrainProperties(selectedTerrain);
+
+      onTileChange(row, col, {
+        terrain: selectedTerrain,
+        walkable: terrainProps.walkable,
+      });
+    },
+    [selectedTerrain, onTileChange]
+  );
+
   // Start painting or panning
   const handleMouseDown = useCallback(
     (e: React.MouseEvent, row?: number, col?: number) => {
@@ -175,7 +188,7 @@ export const MapEditorCanvas: React.FC<MapEditorCanvasProps> = ({
         paintTile(row, col);
       }
     },
-    [spacePressed, selectedTerrain]
+    [spacePressed, paintTile]
   );
 
   // Stop painting or panning
@@ -232,18 +245,8 @@ export const MapEditorCanvas: React.FC<MapEditorCanvasProps> = ({
         paintTile(row, col);
       }
     },
-    [isPainting, isPanning, selectedTerrain]
+    [isPainting, isPanning, paintTile]
   );
-
-  // Paint a tile with the selected terrain
-  const paintTile = (row: number, col: number) => {
-    const terrainProps = getTerrainProperties(selectedTerrain);
-
-    onTileChange(row, col, {
-      terrain: selectedTerrain,
-      walkable: terrainProps.walkable,
-    });
-  };
 
   // Handle mouse leave canvas
   const handleMouseLeave = () => {
@@ -264,6 +267,10 @@ export const MapEditorCanvas: React.FC<MapEditorCanvasProps> = ({
 
         const terrainProps = getTerrainProperties(tile.terrain);
         const isHovered = hoveredTile?.row === row && hoveredTile?.col === col;
+        // Make portals transparent when map has background image
+        const tileColor = tile.terrain === 'portal' && mapData.backgroundImage
+          ? 'transparent'
+          : terrainProps.color;
 
         tiles.push(
           <div
@@ -271,7 +278,7 @@ export const MapEditorCanvas: React.FC<MapEditorCanvasProps> = ({
             className={styles.tile}
             style={{
               position: 'absolute',
-              backgroundColor: terrainProps.color,
+              backgroundColor: tileColor,
               width: `${effectiveTileSize}px`,
               height: `${effectiveTileSize}px`,
               left: `${col * effectiveTileSize}px`,
@@ -328,13 +335,20 @@ export const MapEditorCanvas: React.FC<MapEditorCanvasProps> = ({
           width: `${canvasWidth}px`,
           height: `${canvasHeight}px`,
           position: 'relative',
-          backgroundImage: backgroundImageUrl ? `url(${backgroundImageUrl})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'top left',
-          backgroundRepeat: 'no-repeat',
         }}
         onMouseDown={(e) => handleMouseDown(e)}
       >
+        {backgroundImageUrl && (
+          <div
+            className={styles.backgroundLayer}
+            style={{
+              backgroundImage: `url(${backgroundImageUrl})`,
+              backgroundSize: '100% 100%',
+              backgroundPosition: 'top left',
+              backgroundRepeat: 'no-repeat',
+            }}
+          />
+        )}
         {visibleTiles}
       </div>
 

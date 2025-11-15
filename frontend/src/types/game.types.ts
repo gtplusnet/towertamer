@@ -18,6 +18,7 @@ export const TerrainType = {
   WATER: 'water',
   WALL: 'wall',
   TREE: 'tree',
+  BARRIER: 'barrier',  // Non-walkable, transparent (blocks movement but shows background)
   PORTAL: 'portal',
   GRASS: 'grass',  // Legacy - kept for backward compatibility
 } as const;

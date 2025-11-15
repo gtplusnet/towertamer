@@ -3,7 +3,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #2d5016;
+  background: #000000;
 }
 
 .mapContainer {
@@ -24,11 +24,21 @@
   height: 100%;
 }
 
+.backgroundLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 1.0;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .tile {
   position: absolute;
   box-sizing: border-box;
   /* Use box-shadow instead of border to avoid affecting layout */
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
 /* Legacy tile styles - no longer used but kept for compatibility */

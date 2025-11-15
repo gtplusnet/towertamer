@@ -8,7 +8,7 @@ export interface TerrainProperties {
 
 export const TERRAIN_CONFIG: Record<TerrainType, TerrainProperties> = {
   [TerrainType.NONE]: {
-    color: 'transparent',  // Shows background image
+    color: '#3a3a3a',  // Dark grey - walkable
     walkable: true,
     name: 'None',
   },
@@ -31,6 +31,11 @@ export const TERRAIN_CONFIG: Record<TerrainType, TerrainProperties> = {
     color: '#2d5016',
     walkable: false,
     name: 'Tree',
+  },
+  [TerrainType.BARRIER]: {
+    color: '#cc0000',  // Red - non-walkable barrier
+    walkable: false,
+    name: 'Barrier',
   },
   [TerrainType.PORTAL]: {
     color: '#9b59b6',

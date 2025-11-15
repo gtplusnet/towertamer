@@ -2,8 +2,9 @@ import { Request, Response } from 'express';
 import { Map } from '../models/Map';
 import { PlayerState } from '../models/PlayerState';
 import mongoose from 'mongoose';
-import { validateMapImageDimensions } from '../utils/imageValidator';
+import { validateAndProcessMapImage } from '../utils/imageValidator';
 import { deleteBackgroundImage } from '../middleware/upload.middleware';
+import path from 'path';
 
 /**
  * Helper function to generate slug from map name
@@ -519,16 +520,20 @@ export const uploadBackgroundImage = async (req: Request, res: Response): Promis
       return;
     }
 
-    // Validate image dimensions
-    const validation = await validateMapImageDimensions(
+    // Generate output filename (WebP format)
+    const outputFilename = `${id}_${Date.now()}.webp`;
+    const outputPath = path.join(path.dirname(req.file.path), outputFilename);
+
+    // Validate aspect ratio and process image (resize + convert to WebP)
+    const validation = await validateAndProcessMapImage(
       req.file.path,
+      outputPath,
       map.width,
       map.height
     );
 
     if (!validation.valid) {
-      // Delete uploaded file if validation fails
-      await deleteBackgroundImage(req.file.filename);
+      // File already deleted by validateAndProcessMapImage
       res.status(400).json({
         success: false,
         message: validation.error,
@@ -541,8 +546,8 @@ export const uploadBackgroundImage = async (req: Request, res: Response): Promis
       await deleteBackgroundImage(map.backgroundImage);
     }
 
-    // Update map with new background image path
-    map.backgroundImage = `/uploads/maps/${req.file.filename}`;
+    // Update map with new background image path (WebP)
+    map.backgroundImage = `/uploads/maps/${outputFilename}`;
     await map.save();
 
     res.status(200).json({

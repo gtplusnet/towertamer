@@ -12,7 +12,7 @@ export interface IPortalData {
 }
 
 export interface ITile {
-  terrain: 'none' | 'grass' | 'water' | 'wall' | 'tree' | 'portal';
+  terrain: 'none' | 'grass' | 'water' | 'wall' | 'tree' | 'barrier' | 'portal';
   walkable: boolean;
   portalData?: IPortalData;
 }
@@ -68,7 +68,7 @@ const tileSchema = new Schema<ITile>(
   {
     terrain: {
       type: String,
-      enum: ['none', 'grass', 'water', 'wall', 'tree', 'portal'],
+      enum: ['none', 'grass', 'water', 'wall', 'tree', 'barrier', 'portal'],
       required: true,
     },
     walkable: {

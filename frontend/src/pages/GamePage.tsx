@@ -4,6 +4,7 @@ import { Character } from '../components/Character/Character';
 import { OtherPlayer } from '../components/OtherPlayer/OtherPlayer';
 import { JoystickController } from '../components/JoystickController/JoystickController';
 import { FadeTransition } from '../components/FadeTransition/FadeTransition';
+import { MapNameDisplay } from '../components/MapNameDisplay/MapNameDisplay';
 import { useCharacterMovement } from '../hooks/useCharacterMovement';
 import { useMultiplayer } from '../hooks/useMultiplayer';
 import { loadMap } from '../utils/mapLoader';
@@ -224,6 +225,7 @@ export const GamePage = () => {
           tileSize={tileSize}
         />
       </JoystickController>
+      <MapNameDisplay mapName={mapData.name} />
       <FadeTransition isTransitioning={isTransitioning} />
     </div>
   );
