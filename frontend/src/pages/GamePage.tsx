@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { GameMap } from '../components/GameMap/GameMap';
 import { Character } from '../components/Character/Character';
 import { OtherPlayer } from '../components/OtherPlayer/OtherPlayer';
@@ -18,6 +18,7 @@ export const GamePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const isTransitioningRef = useRef(false);
 
   // Initialize position from playerState or default
   const [characterPosition, setCharacterPosition] = useState<GridPosition>(
@@ -74,7 +75,11 @@ export const GamePage = () => {
 
   // Handle portal entry - switch to new map with fade transition
   const handlePortalEnter = useCallback((portalData: PortalData) => {
+    // Prevent duplicate portal processing if already transitioning
+    if (isTransitioningRef.current) return;
+
     setIsTransitioning(true);
+    isTransitioningRef.current = true;
 
     // After fade-out (300ms), load new map
     setTimeout(() => {
@@ -92,6 +97,7 @@ export const GamePage = () => {
       // After map loads, fade back in
       setTimeout(() => {
         setIsTransitioning(false);
+        isTransitioningRef.current = false;
       }, 100);
     }, 300);
   }, []);
@@ -122,14 +128,14 @@ export const GamePage = () => {
 
   // Emit socket events when character moves
   useEffect(() => {
-    if (!socketService.isConnected() || !mapData || !currentMapId) return;
+    if (!socketService.isConnected() || !mapData || !currentMapId || isTransitioningRef.current) return;
 
     socketService.emitPlayerMove({
       position: character.position,
       direction: character.direction,
       currentMap: currentMapId,
     });
-  }, [character.position, character.direction, currentMapId, mapData]);
+  }, [character.position, character.direction, mapData]);
 
   // Handle map reset from server (when trying to access unpublished map)
   useEffect(() => {

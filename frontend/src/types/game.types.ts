@@ -14,11 +14,12 @@ export type Direction = 'up' | 'down' | 'left' | 'right' | 'idle';
 
 // Terrain types for tiles
 export const TerrainType = {
-  GRASS: 'grass',
+  NONE: 'none',    // Walkable, transparent (shows background)
   WATER: 'water',
   WALL: 'wall',
   TREE: 'tree',
   PORTAL: 'portal',
+  GRASS: 'grass',  // Legacy - kept for backward compatibility
 } as const;
 
 export type TerrainType = (typeof TerrainType)[keyof typeof TerrainType];
@@ -44,6 +45,7 @@ export interface MapData {
   width: number;  // columns
   height: number; // rows
   tiles: Tile[][];
+  backgroundImage?: string; // Optional URL/path to background image
   isPublished: boolean;
   isDefaultSpawn: boolean;
   createdBy: string | null; // User ObjectId or null

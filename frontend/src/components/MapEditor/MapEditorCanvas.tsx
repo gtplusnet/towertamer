@@ -305,6 +305,11 @@ export const MapEditorCanvas: React.FC<MapEditorCanvasProps> = ({
   // Cursor style
   const cursorStyle = isPanning || (spacePressed && !isPainting) ? 'grabbing' : spacePressed ? 'grab' : 'crosshair';
 
+  // Background image URL (convert relative path to absolute URL)
+  const backgroundImageUrl = mapData.backgroundImage
+    ? `http://100.121.246.85:4025${mapData.backgroundImage}`
+    : undefined;
+
   return (
     <div
       ref={containerRef}
@@ -323,6 +328,10 @@ export const MapEditorCanvas: React.FC<MapEditorCanvasProps> = ({
           width: `${canvasWidth}px`,
           height: `${canvasHeight}px`,
           position: 'relative',
+          backgroundImage: backgroundImageUrl ? `url(${backgroundImageUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'top left',
+          backgroundRepeat: 'no-repeat',
         }}
         onMouseDown={(e) => handleMouseDown(e)}
       >

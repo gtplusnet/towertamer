@@ -8,10 +8,12 @@ import {
   deleteMap,
   togglePublish,
   setDefaultSpawn,
+  uploadBackgroundImage,
 } from '../controllers/map.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { optionalAuth } from '../middleware/optionalAuth.middleware';
 import { requireDeveloper } from '../middleware/developer.middleware';
+import { uploadMapBackground } from '../middleware/upload.middleware';
 
 const router = Router();
 
@@ -27,5 +29,12 @@ router.put('/:id', authenticate, requireDeveloper, updateMap);
 router.delete('/:id', authenticate, requireDeveloper, deleteMap);
 router.patch('/:id/publish', authenticate, requireDeveloper, togglePublish);
 router.patch('/:id/set-default', authenticate, requireDeveloper, setDefaultSpawn);
+router.post(
+  '/:id/background',
+  authenticate,
+  requireDeveloper,
+  uploadMapBackground.single('background') as any,
+  uploadBackgroundImage
+);
 
 export default router;

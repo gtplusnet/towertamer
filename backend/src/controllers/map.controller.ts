@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { Map } from '../models/Map';
 import { PlayerState } from '../models/PlayerState';
 import mongoose from 'mongoose';
+import { validateMapImageDimensions } from '../utils/imageValidator';
+import { deleteBackgroundImage } from '../middleware/upload.middleware';
 
 /**
  * Helper function to generate slug from map name
@@ -473,6 +475,95 @@ export const setDefaultSpawn = async (req: Request, res: Response): Promise<void
     res.status(500).json({
       success: false,
       message: 'Error setting default spawn',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Upload background image for a map
+ * Developer only
+ * Validates image dimensions match map size (width × 24px, height × 24px)
+ */
+export const uploadBackgroundImage = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid map ID',
+      });
+      return;
+    }
+
+    // Check if file was uploaded
+    if (!req.file) {
+      res.status(400).json({
+        success: false,
+        message: 'No image file provided',
+      });
+      return;
+    }
+
+    const map = await Map.findById(id);
+
+    if (!map) {
+      // Delete uploaded file if map not found
+      await deleteBackgroundImage(req.file.filename);
+      res.status(404).json({
+        success: false,
+        message: 'Map not found',
+      });
+      return;
+    }
+
+    // Validate image dimensions
+    const validation = await validateMapImageDimensions(
+      req.file.path,
+      map.width,
+      map.height
+    );
+
+    if (!validation.valid) {
+      // Delete uploaded file if validation fails
+      await deleteBackgroundImage(req.file.filename);
+      res.status(400).json({
+        success: false,
+        message: validation.error,
+      });
+      return;
+    }
+
+    // Delete old background image if exists
+    if (map.backgroundImage) {
+      await deleteBackgroundImage(map.backgroundImage);
+    }
+
+    // Update map with new background image path
+    map.backgroundImage = `/uploads/maps/${req.file.filename}`;
+    await map.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Background image uploaded successfully',
+      data: {
+        map,
+        imageUrl: map.backgroundImage,
+      },
+    });
+  } catch (error: any) {
+    console.error('Upload background image error:', error);
+
+    // Try to delete uploaded file on error
+    if (req.file) {
+      await deleteBackgroundImage(req.file.filename);
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Error uploading background image',
       error: error.message,
     });
   }

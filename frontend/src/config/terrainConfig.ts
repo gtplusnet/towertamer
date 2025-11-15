@@ -7,10 +7,15 @@ export interface TerrainProperties {
 }
 
 export const TERRAIN_CONFIG: Record<TerrainType, TerrainProperties> = {
+  [TerrainType.NONE]: {
+    color: 'transparent',  // Shows background image
+    walkable: true,
+    name: 'None',
+  },
   [TerrainType.GRASS]: {
     color: '#4a7c2f',
     walkable: true,
-    name: 'Grass',
+    name: 'Grass (Legacy)',
   },
   [TerrainType.WATER]: {
     color: '#2e5c8a',

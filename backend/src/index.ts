@@ -3,6 +3,7 @@ import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import { connectDatabase } from './config/database';
 import authRoutes from './routes/auth.routes';
 import mapRoutes from './routes/map.routes';
@@ -34,6 +35,9 @@ app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 // Increase body size limit for large maps (500x500 = 250k tiles can be ~10-20MB)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health check endpoint
 app.get('/health', (_req, res) => {

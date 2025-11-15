@@ -15,7 +15,7 @@ export const MapEditorPage: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   // Selected terrain for painting
-  const [selectedTerrain, setSelectedTerrain] = useState<TerrainType>(TerrainType.GRASS);
+  const [selectedTerrain, setSelectedTerrain] = useState<TerrainType>(TerrainType.NONE);
 
   // Zoom level (0.25 = 25%, 1 = 100%, 2 = 200%)
   const [zoom, setZoom] = useState<number>(1);
@@ -85,10 +85,10 @@ export const MapEditorPage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // Create empty map with grass tiles
+      // Create empty map with none (transparent) tiles
       const tiles: Tile[][] = Array.from({ length: height }, () =>
         Array.from({ length: width }, () => ({
-          terrain: TerrainType.GRASS,
+          terrain: TerrainType.NONE,
           walkable: true,
         }))
       );

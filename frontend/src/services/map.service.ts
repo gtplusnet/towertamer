@@ -195,6 +195,33 @@ class MapService {
       };
     }
   }
+
+  // Upload background image (developer only)
+  async uploadBackgroundImage(
+    id: string,
+    file: File
+  ): Promise<MapResponse & { data?: { map: MapData; imageUrl: string } }> {
+    try {
+      const formData = new FormData();
+      formData.append('background', file);
+
+      const response = await axios.post(`${API_BASE_URL}/maps/${id}/background`, formData, {
+        headers: {
+          ...this.getAuthHeaders(),
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return error.response.data;
+      }
+      return {
+        success: false,
+        message: 'Network error. Please try again.',
+      };
+    }
+  }
 }
 
 export const mapService = new MapService();

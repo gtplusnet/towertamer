@@ -12,7 +12,7 @@ export interface IPortalData {
 }
 
 export interface ITile {
-  terrain: 'grass' | 'water' | 'wall' | 'tree' | 'portal';
+  terrain: 'none' | 'grass' | 'water' | 'wall' | 'tree' | 'portal';
   walkable: boolean;
   portalData?: IPortalData;
 }
@@ -24,6 +24,7 @@ export interface IMap extends Document {
   width: number;
   height: number;
   tiles: ITile[][];
+  backgroundImage?: string; // Optional URL/path to uploaded background image
   isPublished: boolean;
   isDefaultSpawn: boolean;
   createdBy: mongoose.Types.ObjectId | null;
@@ -67,7 +68,7 @@ const tileSchema = new Schema<ITile>(
   {
     terrain: {
       type: String,
-      enum: ['grass', 'water', 'wall', 'tree', 'portal'],
+      enum: ['none', 'grass', 'water', 'wall', 'tree', 'portal'],
       required: true,
     },
     walkable: {
@@ -131,6 +132,10 @@ const mapSchema = new Schema<IMap>(
         },
         message: 'Tiles array dimensions must match width and height',
       },
+    },
+    backgroundImage: {
+      type: String,
+      required: false,
     },
     isPublished: {
       type: Boolean,
